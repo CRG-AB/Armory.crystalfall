@@ -13,7 +13,7 @@ import facebookIcon from "../img/crg/socials/facebook.svg";
 export const Header = () => {
   return (
     <header
-      className="desktop absolute header top-0 left-0 bg-cover bg-center w-full h-20 flex items-center justify-between pl-20 pt-2 pr-4 z-50"
+      className="desktop absolute header top-0 left-0 bg-cover bg-center w-full h-20 flex items-center justify-between pl-20 pt-1 pr-4 z-50 bg-black"
       style={{ backgroundImage: `url(${headerBar})` }}
     >
       <div className="flex items-center">
