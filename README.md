@@ -1,70 +1,117 @@
-# Soulbound Token Claiming Grounds
+# Documentation for the Armory Webpage
 
-This is the front-end for the Soulbound Token smart contract. The project is built with React and uses the ThirdwebProvider for interacting with the Sepolia blockchain.
+## Overview
 
-## Built With
-
-- [React](https://reactjs.org/) - The web framework used
-- [ThirdwebProvider](https://docs.thirdweb.com/) - The blockchain interraction platform used
-- [React Router](https://reactrouter.com/) - Used for routing
-- [Styled-components](https://styled-components.com/) - Used for component styling
-- [Dotenv](https://www.npmjs.com/package/dotenv) - Used to manage environment variables
+The Armory webpage is a front-end application for interacting with in-game item & skill token smart contract. The application is built using React and leverages various libraries and tools for styling, blockchain interaction, and animations.
 
 ## Project Structure
 
-The main entry point of the application is `index.js`. This file sets up the React application, including the routing for different pages such as the landing page, profile page, and claim page.
+### Main Entry Point
 
-The tokens are stored in the `Tokens` folder. This folder contains a JSON file with all the token templates, as well as an `img` folder for all media associated with each token template.
+The main entry point of the application is `index.js`. This file sets up the React application, including routing for different pages such as the landing page, profile page, and claim page.
 
-## Smart Contract
+### Key Components
 
-The smart contract address is stored in CONST.js in the source folder. The contract is link to to Etherscan is https://sepolia.etherscan.io/address/0xEC0502AdB6D7426Fd6531c33bb4832A352F0D58f
+- **LandingPage**: The initial page users see when they visit the site. It includes styled components and animations.
 
-## Available Routes
+  - File: `src/pages/LandingPage.jsx`
 
-- `/` - The landing page of the application.
-- `/profile` - The profile page where users can view their tokens.
-- `/profile/:token/:tokenId` - A detailed view of a specific token owned by the user.
-- `/claim` - The page where users can claim new tokens.
-- `/claim/:token` - The page where users can claim a specific token.
-- `/about` - The about page with information about the project.
+- **AboutPage**: Provides information about the project and its background story.
 
-## Run Locally
+  - File: `src/pages/AboutPage/AboutPage.jsx`
 
-Install dependencies --- yarn -or- npm
+- **SearchPage**: A component within the AboutPage that allows users to explore more about the project.
 
-```bash
+  - File: `src/pages/AboutPage/SearchPage.jsx`
+
+- **ProfilePage**: A page that allows users to view their profile and manage their tokens.
+  - File: `src/pages/ProfilePage/ProfilePage.jsx`
+
+### Styles
+
+The application uses a combination of Tailwind CSS and custom styles defined in CSS files. Key style files include:
+
+- `src/styles/Home.css`: Contains styles for the home page layout and text.
+- `src/styles/header.css`: Defines styles for the header and navigation elements.
+
+### Configuration Files
+
+- **package.json**: Lists all dependencies and scripts for building and running the application.
+
+  - Key Dependencies: `react`, `react-dom`, `styled-components`, `framer-motion`, `tailwindcss`
+  - Key Scripts: `start`, `build`, `deploy`
+
+- **manifest.json**: Provides metadata for the web application, such as icons and theme colors.
+
+### HTML and CSS
+
+- **public/index.html**: The main HTML file that serves as the template for the React application.
+- **src/output.css**: The compiled CSS output from Tailwind CSS and other styles.
+
+## Key Features
+
+- **Responsive Design**: Utilizes media queries and responsive units to ensure the application is accessible on various devices.
+- **Animations**: Uses `framer-motion` for smooth animations and transitions.
+- **Blockchain Interaction**: Integrates with the Sepolia blockchain using the ThirdwebProvider for smart contract interactions with the in-game item token.
+
+## Running the Project
+
+### Prerequisites
+
+- Node.js and npm or Yarn should be installed on your machine.
+
+### Installation
+
+To install the necessary dependencies, run:
+
+```
 yarn
-
----
-
-npm i
 ```
 
-Start the server
+or
 
-```bash
+```
+npm install
+```
+
+### Development
+
+To start the development server, use:
+
+```
 yarn start
+```
 
----
+or
 
+```
 npm start
 ```
 
-## Environment Variables
+### Deployment
 
-To run this project, you will need to add the `CLIENT_ID` variables to your .env file.
+To deploy the application, run:
 
-You can generate your `clientId` and `secretKey` via thirdweb's [dashboard](https://thirdweb.com/create-api-key).
-
-## Deployment
-
-Deploy the application to GitHub-pages using the following command:
-
-```bash
+```
 yarn deploy
+```
 
----
+or
 
+```
 npm run deploy
+```
+
+### Github Pages Deployment
+
+To deploy the application to Github Pages, run:
+
+```
+yarn gh-pages
+```
+
+or
+
+```
+npm run gh-pages
 ```
