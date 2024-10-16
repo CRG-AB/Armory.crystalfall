@@ -367,11 +367,11 @@ export const SortingSidebar = ({
       <Expandable
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
-        className="!absolute top-0 left-0 z-40 h-10 w-64 transition-all duration-500 ease-out"
+        className="!absolute top-0 left-0 z-10 h-10 w-64 transition-all duration-500 ease-out"
       />
       <Sidebar
         backgroundColor="#151419"
-        className={`h-full top-0 left-0 z-50 animate-smooth-right ${
+        className={`h-full top-0 left-0 z-40 animate-smooth-right ${
           isSidebarOpen ? "block translate-x-0" : "hidden -translate-x-full"
         }`}
         width="300px"
