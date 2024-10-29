@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.953292f7.css",
-    "main.js": "/static/js/main.b0b222a9.js",
+    "main.css": "/static/css/main.695c1328.css",
+    "main.js": "/static/js/main.f1870f0e.js",
     "static/js/701.1470ed4c.chunk.js": "/static/js/701.1470ed4c.chunk.js",
     "static/js/1092.e85d4617.chunk.js": "/static/js/1092.e85d4617.chunk.js",
     "static/js/9189.6e016ed4.chunk.js": "/static/js/9189.6e016ed4.chunk.js",
@@ -136,6 +136,8 @@
     "static/media/arrow-btn-hover-up.webp": "/static/media/arrow-btn-hover-up.d6fb5cc61fbbfb2bb279.webp",
     "static/media/arrow-btn-default-up.webp": "/static/media/arrow-btn-default-up.9ba7e2ae80038674c31a.webp",
     "static/media/Button_Highlight.svg": "/static/media/Button_Highlight.50a2dc95dea74b69fba2.svg",
+    "static/media/buttonnew.svg": "/static/media/buttonnew.3abe08a0c2d1de7ceae143c6a0cf52db.svg",
+    "static/media/buttonnewhighlight.svg": "/static/media/buttonnewhighlight.50a2dc95dea74b69fba248140c5eb370.svg",
     "static/media/slick.svg": "/static/media/slick.2630a3e3eab21c607e21.svg",
     "static/media/slick.eot": "/static/media/slick.a4e97f5a2a64f0ab1323.eot",
     "static/media/slick.ttf": "/static/media/slick.c94f7671dcc99dce43e2.ttf",
@@ -147,8 +149,8 @@
     "static/media/Line-fade-300.webp": "/static/media/Line-fade-300.5517df46c36fd4cd70ac.webp",
     "static/media/facebook.svg": "/static/media/facebook.2abc8a7d3b4b6a3b14a541e52e76b7de.svg",
     "static/media/x.svg": "/static/media/x.1cee4f0245bcd2b505df2d03cb94094b.svg",
-    "main.953292f7.css.map": "/static/css/main.953292f7.css.map",
-    "main.b0b222a9.js.map": "/static/js/main.b0b222a9.js.map",
+    "main.695c1328.css.map": "/static/css/main.695c1328.css.map",
+    "main.f1870f0e.js.map": "/static/js/main.f1870f0e.js.map",
     "701.1470ed4c.chunk.js.map": "/static/js/701.1470ed4c.chunk.js.map",
     "1092.e85d4617.chunk.js.map": "/static/js/1092.e85d4617.chunk.js.map",
     "6274.242b31f7.chunk.js.map": "/static/js/6274.242b31f7.chunk.js.map",
@@ -216,7 +218,7 @@
     "5419.3bee6211.chunk.js.map": "/static/js/5419.3bee6211.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.953292f7.css",
-    "static/js/main.b0b222a9.js"
+    "static/css/main.695c1328.css",
+    "static/js/main.f1870f0e.js"
   ]
 }
