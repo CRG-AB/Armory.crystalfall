@@ -6,13 +6,30 @@ const sdk = new ThirdwebSDK(13337, {
 });
 
 export async function fetchTokenIds() {
-  const url = `https://13337.api.sphere.market/tokens/ids/v1?collection=${ITEMS_CONTRACT}&limit=10000`;
-  const response = await fetch(url, {
-    method: "GET",
+  const url = `https://api.testnet.onbeam.com/v2/ASSETS/${ITEMS_CONTRACT}`;
+  const options = {
+    method: "POST",
     headers: {
       accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.REACT_APP_BEAM_READ_ONLY_API_KEY}`,
     },
-  });
+    body: JSON.stringify({
+      continuation: null,
+      chainId: 1337,
+      minRarityRank: null,
+      maxRarityRank: null,
+      minFloorAskPrice: null,
+      maxFloorAskPrice: null,
+      includeAttributes: false,
+      attributes: null,
+      sortDirection: "asc",
+      sortBy: "floorAskPrice",
+      limit: 100,
+    }),
+  };
+
+  const response = await fetch(url, options);
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
