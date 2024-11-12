@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkARMORY=self.webpackChunkARMORY||[]).push([[5025],{25025:e=>{e.exports=JSON.parse('[{"type":"function","name":"supportsInterface","inputs":[{"name":"interfaceId","type":"bytes4","internalType":"bytes4"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"}]')}}]);
