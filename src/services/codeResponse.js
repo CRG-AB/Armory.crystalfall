@@ -1,7 +1,7 @@
 export const codeResponse = () => {
   const code = new URLSearchParams(window.location.search).get("code");
-  const url = "https://naramunzapi-beta.azurewebsites.net/api/token/epic";
-  const url2 = "https://naramunzapi-beta.azurewebsites.net/api/users/wallet";
+  const url = "https://api-dev.crystalfall.com/api/token/epic";
+  const url2 = "https://api-dev.crystalfall.com/api/users/wallet";
   const authHeaderValue = btoa(
     "xyza7891JqURqLDsngnChqqfNdWvDsup:3TozrQC77uKxyjiqE0cNfgqkFoOBqzL2hdkxueaUoFs"
   );

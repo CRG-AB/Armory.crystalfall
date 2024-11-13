@@ -6,20 +6,54 @@ const sdk = new ThirdwebSDK(13337, {
 });
 
 export async function fetchTokenIds() {
-  const url = `https://13337.api.sphere.market/tokens/ids/v1?collection=${ITEMS_CONTRACT}&limit=10000`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-    },
-  });
+  const tokenCount = await totalCount();
+  const url =
+    "https://api.testnet.onbeam.com/v2/assets/0x397e9fC82399d17Ee3a99E359Ec64b2B3bb8922d";
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+  const tokenIds = [];
+
+  try {
+    let continuation = null;
+    for (let i = 0; i < tokenCount; i += 100) {
+      const limit = tokenCount - i > 100 ? 100 : tokenCount - i;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "x-api-key": process.env.REACT_APP_BEAM_READ_ONLY_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          continuation: continuation,
+          chainId: 13337,
+          minRarityRank: null,
+          maxRarityRank: null,
+          minFloorAskPrice: null,
+          maxFloorAskPrice: null,
+          includeAttributes: false,
+          attributes: null,
+          sortDirection: "desc",
+          sortBy: "updatedAt",
+          limit: limit,
+        }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      const data = responseData.data;
+      // Assuming the response structure contains tokenIds, adjust the return statement accordingly
+      tokenIds.push(...data.map((token) => token.assetId));
+      continuation = responseData.continuation;
+    }
+    return tokenIds;
+  } catch (error) {
+    console.error("Error fetching token IDs:", error);
+    throw error;
   }
-
-  const data = await response.json();
-  return data.tokens;
 }
 
 export async function fetchNFTs(tokenIds) {
@@ -34,7 +68,8 @@ export async function fetchNFTs(tokenIds) {
 export async function totalCount() {
   const contract = await sdk.getContract(ITEMS_CONTRACT);
   const count = await contract.erc721.totalCount();
-  return count;
+  const decodedCount = count.toNumber();
+  return decodedCount;
 }
 
 export async function fetchNFT(tokenId) {

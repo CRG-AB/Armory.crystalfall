@@ -74,15 +74,36 @@ export const SortingSidebar = ({
   useEffect(() => {
     const filterNFTs = (nfts) => {
       if (!nfts || activeCategoryClassFilters.length <= 0) return [];
+      let activeCategoryFilters = [];
+      let activeSubCategoryFilters = [];
+      let activeClassFilters = [];
+      let activeSubClassFilters = [];
+      activeCategoryFilters = Object.keys(
+        activeCategoryClassFilters.category
+      ).filter((key) => activeCategoryClassFilters.category[key] === true);
+
+      if (activeCategoryFilters.length > 0) {
+        activeSubCategoryFilters = Object.keys(
+          activeCategoryClassFilters.subCategory
+        ).filter((key) => activeCategoryClassFilters.subCategory[key] === true);
+      }
+
+      if (activeCategoryFilters.length > 0) {
+        activeClassFilters = Object.keys(
+          activeCategoryClassFilters.itemClass
+        ).filter((key) => activeCategoryClassFilters.itemClass[key] === true);
+      }
+
+      if (activeClassFilters.length > 0) {
+        activeSubClassFilters = Object.keys(
+          activeCategoryClassFilters.subClass
+        ).filter((key) => activeCategoryClassFilters.subClass[key] === true);
+      }
       return nfts.filter((nft) => {
         const metadata = nft.metadata;
         if (!metadata.properties) {
           return false;
         }
-        let activeCategoryFilters = [];
-        let activeSubCategoryFilters = [];
-        let activeClassFilters = [];
-
         // filter by searchTerm
         if (
           searchTerm &&
@@ -93,9 +114,6 @@ export const SortingSidebar = ({
 
         // Filter by Category and Class
         // Filter "category"
-        activeCategoryFilters = Object.keys(
-          activeCategoryClassFilters.category
-        ).filter((key) => activeCategoryClassFilters.category[key] === true);
         if (
           activeCategoryFilters.length > 0 &&
           !activeCategoryFilters.includes(metadata.properties.category)
@@ -104,34 +122,19 @@ export const SortingSidebar = ({
         }
 
         // Filter "subCategory"
-        if (activeCategoryFilters.length > 0) {
-          activeSubCategoryFilters = Object.keys(
-            activeCategoryClassFilters.subCategory
-          ).filter(
-            (key) => activeCategoryClassFilters.subCategory[key] === true
-          );
-          if (
-            activeSubCategoryFilters.length > 0 &&
-            !activeSubCategoryFilters.includes(
-              metadata.properties.subCategory
-            ) &&
-            metadata.properties.category == "Weapon"
-          ) {
-            return false;
-          }
-        }
-
-        // Filter "itemClass"
-        if (activeCategoryFilters.length > 0) {
-          activeClassFilters = Object.keys(
-            activeCategoryClassFilters.itemClass
-          ).filter((key) => activeCategoryClassFilters.itemClass[key] === true);
+        if (
+          activeSubCategoryFilters.length > 0 &&
+          !activeSubCategoryFilters.includes(metadata.properties.subCategory) &&
+          metadata.properties.category == "Weapon"
+        ) {
+          // Filter "itemClass"
           if (
             activeClassFilters.length > 0 &&
             !activeClassFilters.includes(metadata.properties.itemClass)
           ) {
             return false;
           }
+          return false;
         }
 
         // Filter "subClass"
@@ -140,10 +143,6 @@ export const SortingSidebar = ({
           activeSubCategoryFilters.length > 0 &&
           metadata.properties.category == "Weapon"
         ) {
-          let activeSubClassFilters = Object.keys(
-            activeCategoryClassFilters.subClass
-          ).filter((key) => activeCategoryClassFilters.subClass[key] === true);
-
           let bool = true;
           if (activeSubClassFilters.length > 0) {
             switch (metadata.properties.itemClass) {
@@ -296,7 +295,6 @@ export const SortingSidebar = ({
           // If the NFT does not have all the mods in the modList, exclude it. Check the min and max values of the mods
           if (
             !modsFilterArray.every((filterMod) => {
-              console.log(filterMod);
               return formattedItemMods.some(
                 (itemMod) =>
                   filterMod.mod == itemMod.mod &&

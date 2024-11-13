@@ -1,0 +1,28 @@
+{
+  "name": "Malachite Shield",
+  "description": "Shield",
+  "attributes": {
+    "season": "Closed Beta",
+    "originallyMinted": "Closed Beta",
+    "itemLooted": "Closed Beta",
+    "category": "OffHand",
+    "subCategory": "",
+    "itemClass": "Shield",
+    "itemSubClass": "",
+    "baseItem": "Malachite Shield",
+    "family": "Toughness",
+    "level": 2,
+    "rarity": "Rare",
+    "quality": 1,
+    "implicitMods": "+24% Block Chance(Global), +3% Movement Speed Increased(Global)",
+    "aetherealMods": "+1 Aether Gained(Global) On Knockback, +87% Aether Gained Increased(Global) On Knockback",
+    "defense": 20,
+    "maxDurability": 35,
+    "levelRequirement": 1,
+    "classRequirement": "knight_class",
+    "attributeRequirements": "0, 0, 0, 0",
+    "uncommonMods": "+1 Aether Damage Fixed(Global)",
+    "rareMods": "+2 Defense(Base), +2 Defense(Base), +6% Loot Rarity Increased(Global)",
+    "socketMods": ""
+  }
+}

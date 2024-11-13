@@ -1,11 +1,10 @@
 import { styled, keyframes } from "styled-components";
-
 import CardBackground from "../img/ui/big-text-box.webp";
 import horisontalLine from "../img/ui/Line-fade-300.webp";
 import downArrowLine from "../img/ui/downArrowLine.webp";
 import upArrowLine from "../img/ui/upArrowLine.webp";
 import { useNavigate } from "react-router-dom";
-import { ITEMS_CONTRACT } from "../CONST";
+import { ITEMS_CONTRACT } from "../CONST.js";
 
 const customAnimation = keyframes`
   0% {
@@ -75,6 +74,7 @@ const TraitBox = styled.div`
     animation: ${customAnimation} 1s ease-in-out;
   }
 `;
+
 const Vitals = styled.div`
   font-size: 1.2rem;
   height: 30px;
@@ -94,117 +94,217 @@ const Vitals = styled.div`
   -webkit-text-fill-color: transparent;
 `;
 
-export const ItemCard = ({ token }) => {
-  console.log(token);
-  const newArray = (oldArray, ...indices) => {
-    return indices.map((index) => oldArray[index]);
-  };
-  const navigate = useNavigate();
-
-  const semanticKeyes = [
-    "Aethereal Mods", //0
-    "Attack Speed", //1
-    "Attribute Requirements", //2
-    "Base Item", //3
-    "Category", //4
-    "Class Requirement", //5
-    "Damage Max", //6
-    "Damage Min", // 7
-    "Damage Type", //8
-    "Defense", //9
-    "Family", //10
-    "Implicit Mods", //11
-    "Item Class", //12
-    "Item Looted", //13
-    "Item Sub Class", //14
-    "Level", //15
-    "Level Requirement", //16
-    "Max Charges", //17
-    "Max Durability", //18
-    "Originally Minted", //19
-    "Quality", //20
-    "Range", //21
-    "Rare Mods", //22
-    "Rarity", //23
-    "Season", //24
-    "Socket Mods", //25
-    "Sub Category", //26
-    "Theme", //27
-    "Uncommon Mods", //28
+const processMetadata = (semanticToken) => {
+  // Common fields across all item types
+  const commonFields = [
+    "season",
+    "originallyMinted",
+    "itemLooted",
+    "category",
+    "subCategory",
+    "itemClass",
+    "itemSubClass",
+    "baseItem",
+    "family",
+    "level",
+    "rarity",
+    "quality",
   ];
 
-  const semanticToken = Object.entries(token.metadata.properties)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map((trait, i) => {
-      let newTrait = {};
-      newTrait.trait_type = `${semanticKeyes[i]}`;
-      newTrait.value = `${trait[1]}`;
-      return newTrait;
-    });
+  // Equipment specific fields
+  const equipmentFields = [
+    "defense",
+    "maxDurability",
+    "levelRequirement",
+    "classRequirement",
+    "attributeRequirements",
+    "theme",
+    "attackSpeed",
+    "range",
+  ];
 
-  let damageRange;
-  if (semanticToken[7].value == "0" || semanticToken[6].value == "0") {
-    damageRange = [
-      {
-        trait_type: "Damage Range",
-        value: `Undefined`,
-      },
-    ];
-  } else {
-    damageRange = [
-      {
-        trait_type: "Damage Range",
-        value: `${semanticToken[7].value} - ${semanticToken[6].value}`,
-      },
-    ];
-  }
-  const vitals = damageRange.concat(
-    newArray(semanticToken, 21, 20, 9, 8, 1, 18)
+  // Mod fields that need special handling
+  const modFields = [
+    "implicitMods",
+    "aetherealMods",
+    "uncommonMods",
+    "rareMods",
+    "socketMods",
+  ];
+
+  // Process common fields
+  const baseMetadata = commonFields.map((field) => ({
+    trait_type: field,
+    value: semanticToken.find((trait) => trait.trait_type === field)?.value,
+  }));
+
+  // Process equipment fields
+  const equipmentMetadata = equipmentFields.map((field) => ({
+    trait_type: field,
+    value: processEquipmentField(
+      semanticToken.find((trait) => trait.trait_type === field)?.value
+    ),
+  }));
+
+  // Process mods
+  const modsMetadata = modFields.map((field) => ({
+    trait_type: field,
+    value: processModString(
+      semanticToken.find((trait) => trait.trait_type === field)?.value
+    ),
+  }));
+
+  // Process damage fields if they exist
+  const damageMetadata = processDamageFields(semanticToken);
+
+  return [
+    ...baseMetadata,
+    ...equipmentMetadata,
+    ...modsMetadata,
+    ...damageMetadata,
+  ].filter((field) => isValidValue(field.value));
+};
+
+const processEquipmentField = (value) => {
+  if (!value || value === "") return null;
+  return value;
+};
+
+const processModString = (value) => {
+  if (!value || value === "") return null;
+  return value
+    .split(",")
+    .map((mod) => mod.trim())
+    .filter((mod) => mod && mod !== "");
+};
+
+const processDamageFields = (semanticToken) => {
+  const damageTypes = ["physical", "lightning", "fire", "cold", "aether"];
+  return damageTypes
+    .map((type) => {
+      const min = semanticToken.find(
+        (trait) => trait.trait_type === `${type}DamageMin`
+      )?.value;
+      const max = semanticToken.find(
+        (trait) => trait.trait_type === `${type}DamageMax`
+      )?.value;
+
+      if (!min || !max) return null;
+
+      return {
+        trait_type: `${type}Damage`,
+        value: `${min}-${max}`,
+      };
+    })
+    .filter((damage) => damage !== null);
+};
+
+const isValidValue = (value) => {
+  if (value === null || value === undefined) return false;
+  if (value === "") return false;
+  if (Array.isArray(value) && value.length === 0) return false;
+  return true;
+};
+
+// Add this new helper function
+const formatTraitType = (text) => {
+  // Convert camelCase to space-separated words and capitalize first letter
+  return (
+    text
+      // Add space between camelCase words
+      .replace(/([A-Z])/g, " $1")
+      // Capitalize first letter
+      .replace(/^./, (str) => str.toUpperCase())
+      // Trim any extra spaces
+      .trim()
   );
-  const traits = newArray(semanticToken, 3, 4, 10, 12, 13, 14, 15, 23, 26);
-  const allTraits = vitals.concat(traits);
-  const filteredTraits = allTraits.filter(
-    (trait) =>
-      trait.value != "Undefined" &&
-      trait.value != 0 &&
-      trait.value != "" &&
-      trait.value != null &&
-      trait.value != undefined &&
-      trait.value != "0"
-  );
-  const displayedTraitsUpper = filteredTraits.slice(0, 7);
-  const displayedTraitsLower = filteredTraits.slice(7, filteredTraits.length);
+};
 
-  const aetherialMods = semanticToken[0].value.split(",");
+export const ItemCard = ({ token }) => {
+  console.log(token);
+  const navigate = useNavigate();
 
-  const implicitMods = semanticToken[11].value.split(",");
+  let displayedTraitsUpper = [];
+  let displayedTraitsLower = [];
+  let aetherialMods = [];
+  let implicitMods = [];
+  let rareMods = [];
+  let socketMods = [];
+  let uncommonMods = [];
+  let requirements = [];
 
-  const rareMods = semanticToken[22].value.split(",");
+  if (token.metadata && token.metadata.properties) {
+    const semanticToken = Object.entries(token.metadata.properties)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([trait_type, value]) => ({ trait_type, value }));
+    console.log("semanticToken", semanticToken);
 
-  const socketMods = semanticToken[25].value.split(",");
+    const metadata = processMetadata(semanticToken);
+    console.log("metadata", metadata);
 
-  const uncommonMods = semanticToken[28].value.split(",");
-
-  const requirements = semanticToken
-    .filter(
+    const traits = metadata.filter(
       (trait) =>
-        trait.trait_type.includes("Requirement") &&
-        !trait.trait_type.includes("Attribute")
-    )
-    .map((trait) => {
-      if (trait.trait_type.includes("Class")) {
-        return { ...trait, value: `Class: ${trait.value}, ` };
-      }
-      if (trait.trait_type.includes("Level")) {
-        return { ...trait, value: `Level: ${trait.value}` };
-      }
-      return trait;
-    });
+        trait.trait_type !== "Damage" &&
+        ![
+          "implicitMods",
+          "aetherealMods",
+          "uncommonMods",
+          "rareMods",
+          "socketMods",
+        ].includes(trait.trait_type)
+    );
 
+    if (traits.length > 7) {
+      displayedTraitsUpper = traits.slice(0, 7);
+      displayedTraitsLower = traits.slice(7);
+    } else {
+      displayedTraitsUpper = traits;
+    }
+
+    aetherialMods =
+      semanticToken
+        .find((trait) => trait.trait_type === "aetherealMods")
+        ?.value.split(",") || [];
+    implicitMods =
+      semanticToken
+        .find((trait) => trait.trait_type === "implicitMods")
+        ?.value.split(",") || [];
+    rareMods =
+      semanticToken
+        .find((trait) => trait.trait_type === "rareMods")
+        ?.value.split(",") || [];
+    socketMods =
+      semanticToken
+        .find((trait) => trait.trait_type === "socketMods")
+        ?.value.split(",") || [];
+    uncommonMods =
+      semanticToken
+        .find((trait) => trait.trait_type === "uncommonMods")
+        ?.value.split(",") || [];
+
+    requirements = semanticToken
+      .filter(
+        (trait) =>
+          (trait.trait_type.includes("classRequirement") ||
+            trait.trait_type.includes("levelRequirement")) &&
+          !trait.trait_type.includes("attributeRequirements") &&
+          trait.value !== undefined &&
+          trait.value !== null &&
+          trait.value !== "" &&
+          trait.value !== 0
+      )
+      .map((trait) => {
+        if (trait.trait_type.includes("classRequirement"))
+          return { ...trait, value: `Class: ${trait.value}` };
+        if (trait.trait_type.includes("levelRequirement"))
+          return { ...trait, value: `Level: ${trait.value}` };
+        return trait;
+      });
+  }
   return (
     <StyledCard>
       <p className="text-red-700 text-center mb-2">
-        All NFTs exist solely on the Testnet and have no real value.
+        All NFTs exist solely on the Testnet and have no real value
       </p>
       <StyledImageDiv>
         <div
@@ -223,55 +323,45 @@ export const ItemCard = ({ token }) => {
             <img src={horisontalLine} className="w-full h-1 my-2" />
             <h3 className="mt-2">
               <b>Requirements: </b>
-              {requirements.map((trait, i) => {
-                if (
-                  !trait.value ||
-                  trait.value == 0 ||
-                  trait.value == "Class: , "
+              {requirements
+                .filter(
+                  (trait) =>
+                    trait.value &&
+                    trait.value !== 0 &&
+                    trait.value !== "Class: , "
                 )
-                  return;
-                return <span key={i}>{trait.value}</span>;
-              })}
+                .map((trait, i) => (
+                  <span key={i}>{trait.value}</span>
+                ))}
             </h3>
             <div className="mt-6">
               Mods:
-              {aetherialMods != ""
-                ? aetherialMods.map((mod, i) => {
-                    return <p key={i}>{mod}</p>;
-                  })
-                : null}
-              {implicitMods != "" ? (
+              {aetherialMods?.length > 0 &&
+                aetherialMods.map((mod, i) => mod && <p key={i}>{mod}</p>)}
+              {implicitMods?.length > 0 && (
                 <>
-                  {implicitMods.map((mod, i) => {
-                    return <p key={i}>{mod}</p>;
-                  })}
+                  {implicitMods.map((mod, i) => mod && <p key={i}>{mod}</p>)}
                   <img src={horisontalLine} alt="" />
                 </>
-              ) : null}
-              {rareMods != "" ? (
+              )}
+              {rareMods?.length > 0 && (
                 <>
-                  {rareMods.map((mod, i) => {
-                    return <p key={i}>{mod}</p>;
-                  })}
+                  {rareMods.map((mod, i) => mod && <p key={i}>{mod}</p>)}
                   <img src={horisontalLine} alt="" />
                 </>
-              ) : null}
-              {socketMods != "" ? (
+              )}
+              {socketMods?.length > 0 && (
                 <>
-                  {socketMods.map((mod, i) => {
-                    return <p key={i}>{mod}</p>;
-                  })}
+                  {socketMods.map((mod, i) => mod && <p key={i}>{mod}</p>)}
                   <img src={horisontalLine} alt="" />
                 </>
-              ) : null}
-              {uncommonMods != "" ? (
+              )}
+              {uncommonMods?.length > 0 && (
                 <>
-                  {uncommonMods.map((mod, i) => {
-                    return <p key={i}>{mod}</p>;
-                  })}
+                  {uncommonMods.map((mod, i) => mod && <p key={i}>{mod}</p>)}
                   <img src={horisontalLine} alt="" />
                 </>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
@@ -290,20 +380,22 @@ export const ItemCard = ({ token }) => {
         {displayedTraitsUpper.map((trait, i) => {
           return (
             <Vitals key={i}>
-              {trait.trait_type}: {trait.value}
+              {formatTraitType(trait.trait_type)}: {trait.value}
             </Vitals>
           );
         })}
       </div>
       <StyledMetadata>
-        {displayedTraitsLower.map((trait, i) => {
-          if (trait.value == "Undefined") return;
-          return (
+        {displayedTraitsLower
+          .filter(
+            (trait) =>
+              trait.value && trait.value !== "Undefined" && trait.value !== 0
+          )
+          .map((trait, i) => (
             <TraitBox key={i}>
-              {trait.trait_type}: {trait.value}
+              {formatTraitType(trait.trait_type)}: {trait.value}
             </TraitBox>
-          );
-        })}
+          ))}
       </StyledMetadata>
       <img src={downArrowLine} className="w-full h-10" />
     </StyledCard>

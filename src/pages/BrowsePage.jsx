@@ -14,6 +14,9 @@ import { thirdWebIPFSLink } from "../services/IPFSLink";
 import city from "../img/images/city-back-drop.webp";
 import softLight from "../img/images/soft-light-fog.webp";
 
+import buttonnew from "../img/ui/buttonnew.svg";
+import buttonnewhighlight from "../img/ui/buttonnewhighlight.svg";
+
 const StyledProfilePage = styled.div`
   background-image: url(${city});
   background-size: cover;
@@ -76,10 +79,12 @@ export const BrowsePage = () => {
   const { contract: contractItems } = useContract(ITEMS_CONTRACT);
   const { data: totalCount } = useTotalCount(contractItems);
   const hasPreviousPage = count > 0;
-  const hasNextPage = (count + 1) * nftsPerPage < totalCount;
-  const totalPages = Math.ceil(totalCount / filteredNFTs.length);
+  const hasNextPage = (count + 1) * nftsPerPage < filteredNFTs.length;
+  const totalPages = Math.ceil(filteredNFTs.length / nftsPerPage);
   const [allNFTs, setAllNFTs] = useState([]);
   const [displayedNfts, setDisplayedNfts] = useState([]);
+
+  const [Skills, setSkills] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -98,6 +103,19 @@ export const BrowsePage = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (Skills) {
+      setFilteredNFTs(
+        allNFTs.filter((nft) => {
+          if (!nft.metadata.description) {
+            return false;
+          }
+          return nft.metadata.description.includes("Unique");
+        })
+      );
+    }
+  }, [Skills, allNFTs]);
 
   useEffect(() => {
     setDisplayedNfts(
@@ -119,21 +137,58 @@ export const BrowsePage = () => {
   return (
     <StyledProfilePage>
       <ContentWrapper>
+        {/* Chose between skills or items, one button for skills and one for items, the active one is highlighted, if skills is false items is active */}
+        <div className="flex -mb-3">
+          <button
+            style={{
+              backgroundImage: Skills
+                ? `url(${buttonnew})`
+                : `url(${buttonnewhighlight})`,
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              width: "150px",
+              height: "50px",
+              marginLeft: "8px",
+            }}
+            onClick={() => setSkills(false)}
+          >
+            Items
+          </button>
+          <button
+            style={{
+              backgroundImage: !Skills
+                ? `url(${buttonnew})`
+                : `url(${buttonnewhighlight})`,
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              width: "150px",
+              height: "50px",
+              marginLeft: "-8px",
+            }}
+            onClick={() => setSkills(true)}
+          >
+            Skills
+          </button>
+        </div>
         <hr />
         <Background>
           <div className="flex h-full">
-            <SortingSidebar
-              isSidebarOpen={isSidebarOpen}
-              nfts={allNFTs}
-              setFilteredNFTs={setFilteredNFTs}
-              setIsSidebarOpen={setIsSidebarOpen}
-            />
+            {Skills ? null : (
+              <SortingSidebar
+                isSidebarOpen={isSidebarOpen}
+                nfts={allNFTs}
+                setFilteredNFTs={setFilteredNFTs}
+                setIsSidebarOpen={setIsSidebarOpen}
+              />
+            )}
             <motion.div
               transition={{ duration: 0.5, ease: [0.04, 0.62, 0.23, 0.98] }}
-              className="flex items-start justify-center"
+              className="flex !items-start justify-center"
               style={{
                 animation: "fadeIn 0.5s",
-                width: isSidebarOpen ? "calc(100% - 300px)" : "100%",
+                width: isSidebarOpen && !Skills ? "calc(100% - 300px)" : "100%",
               }}
             >
               {allNFTs.length == 0 ? (
@@ -160,7 +215,7 @@ export const BrowsePage = () => {
                     {displayedNfts.map((token, i) => {
                       return (
                         <motion.li
-                          layoutId={`item-${token.metadata.id}`}
+                          layoutId={"item-" + token.metadata.id}
                           key={token.metadata.id}
                           transition={{
                             duration: 0.5,
@@ -180,7 +235,7 @@ export const BrowsePage = () => {
                 </AnimatePresence>
               )}
             </motion.div>
-            {filteredNFTs.length > 20 ? (
+            {displayedNfts.length > 20 ? (
               <div className="flex justify-center items-center gap-4 absolute bottom-4 left-[calc(50%-90px)]">
                 <ArrowButton
                   direction={"left"}

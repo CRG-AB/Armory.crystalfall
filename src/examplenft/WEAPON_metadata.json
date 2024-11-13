@@ -1,0 +1,32 @@
+{
+  "name": "Two-Handed Sword",
+  "description": "Two-handed Sword",
+  "attributes": {
+    "season": "Closed Beta",
+    "originallyMinted": "Closed Beta",
+    "itemLooted": "Closed Beta",
+    "category": "Weapon",
+    "subCategory": "Melee",
+    "itemClass": "Sword",
+    "itemSubClass": "TwoHand",
+    "baseItem": "Two-Handed Sword",
+    "family": "Toughness",
+    "level": 2,
+    "rarity": "Rare",
+    "quality": 1,
+    "implicitMods": "+6% Attack Speed Increased(Base)",
+    "aetherealMods": "+2 Aether Gained(Local) On Durability Loss, +60% Aether Gained Increased(Local) On Durability Loss",
+    "theme": "AttackSpeed",
+    "attackSpeed": 1.06,
+    "maxDurability": 48,
+    "levelRequirement": 1,
+    "classRequirement": "knight_class",
+    "attributeRequirements": "0, 0, 0, 0",
+    "uncommonMods": "+3% Knockback Chance(Local)",
+    "rareMods": "+3% Extra Strike Chance(Local), +3% Knockback Chance(Local), +1 Physical Damage Min(Base)",
+    "socketMods": "",
+    "range": 3.0,
+    "physicalDamageMin": 12,
+    "physicalDamageMax": 14
+  }
+}
