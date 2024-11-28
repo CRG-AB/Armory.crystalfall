@@ -119,88 +119,100 @@ export const SortingSidebar = ({
           activeCategoryFilters = Object.keys(activeCategoryClassFilters.category)
             .filter((key) => activeCategoryClassFilters.category[key] === true);
           
+          // If categories are selected, item must match at least one selected category
           if (activeCategoryFilters.length > 0 && !activeCategoryFilters.includes(metadata.properties.category)) {
             return false;
           }
         }
 
-        // Filter "subCategory"
-        if (activeCategoryFilters.length > 0 && activeCategoryClassFilters?.subCategory) {
-          activeSubCategoryFilters = Object.keys(activeCategoryClassFilters.subCategory)
-            .filter((key) => activeCategoryClassFilters.subCategory[key] === true);
-          
-          if (activeSubCategoryFilters.length > 0 && !activeSubCategoryFilters.includes(metadata.properties.subCategory)) {
-            return false;
-          }
-        }
-
-        // Filter "class"
-        if (activeCategoryFilters.length > 0 && 
-            activeSubCategoryFilters.length > 0 && 
-            activeCategoryClassFilters?.itemClass) {
-          activeClassFilters = Object.keys(activeCategoryClassFilters.itemClass)
-            .filter((key) => activeCategoryClassFilters.itemClass[key] === true);
-          
-          if (activeClassFilters.length > 0 && !activeClassFilters.includes(metadata.properties.itemClass)) {
-            return false;
-          }
-        }
-
-        // Filter "subClass"
-        if (activeCategoryFilters.length > 0 && 
-            activeSubCategoryFilters.length > 0 && 
-            activeCategoryClassFilters?.subClass) {
-          let activeSubClassFilters = Object.keys(activeCategoryClassFilters.subClass)
-            .filter((key) => activeCategoryClassFilters.subClass[key] === true);
-
-          let bool = true;
-          if (activeSubClassFilters.length > 0) {
-            switch (metadata.properties.itemClass) {
-              case "Sword":
-                if (
-                  activeSubClassFilters.includes("sword1h") ||
-                  activeSubClassFilters.includes("sword2h")
-                ) {
-                  if (
-                    (!activeSubClassFilters.includes("sword1h") &&
-                      metadata.properties.itemSubClass == "OneHand") ||
-                    (!activeSubClassFilters.includes("sword2h") &&
-                      metadata.properties.itemSubClass == "TwoHand")
-                  )
-                    bool = false;
-                }
-                break;
-              case "Axe":
-                if (
-                  activeSubClassFilters.includes("axe1h") ||
-                  activeSubClassFilters.includes("axe2h")
-                ) {
-                  if (
-                    (!activeSubClassFilters.includes("axe1h") &&
-                      metadata.properties.itemSubClass == "OneHand") ||
-                    (!activeSubClassFilters.includes("axe2h") &&
-                      metadata.properties.itemSubClass == "TwoHand")
-                  )
-                    bool = false;
-                }
-                break;
-              case "Mace":
-                if (
-                  activeSubClassFilters.includes("mace1h") ||
-                  activeSubClassFilters.includes("mace2h")
-                ) {
-                  if (
-                    (!activeSubClassFilters.includes("mace1h") &&
-                      metadata.properties.itemSubClass == "OneHand") ||
-                    (!activeSubClassFilters.includes("mace2h") &&
-                      metadata.properties.itemSubClass == "TwoHand")
-                  )
-                    bool = false;
-                }
-                break;
+        // For each category, apply its specific filters
+        if (metadata.properties.category === "Weapon") {
+          // Filter "subCategory" - Only apply for Weapon category
+          if (activeCategoryClassFilters?.subCategory) {
+            activeSubCategoryFilters = Object.keys(activeCategoryClassFilters.subCategory)
+              .filter((key) => activeCategoryClassFilters.subCategory[key] === true);
+            
+            if (activeSubCategoryFilters.length > 0 && !activeSubCategoryFilters.includes(metadata.properties.subCategory)) {
+              return false;
             }
           }
-          if (!bool) return false;
+
+          // Filter weapon classes
+          if (activeCategoryClassFilters?.itemClass) {
+            const weaponClasses = ["Axe", "Mace", "Sword", "Dagger", "Pistol", "Rifle", "Shotgun"];
+            const activeWeaponClasses = Object.keys(activeCategoryClassFilters.itemClass)
+              .filter((key) => weaponClasses.includes(key) && activeCategoryClassFilters.itemClass[key] === true);
+
+            if (activeWeaponClasses.length > 0 && !activeWeaponClasses.includes(metadata.properties.itemClass)) {
+              return false;
+            }
+          }
+
+          // Filter weapon subclasses
+          if (activeCategoryClassFilters?.subClass) {
+            const activeSubClassFilters = Object.keys(activeCategoryClassFilters.subClass)
+              .filter((key) => activeCategoryClassFilters.subClass[key] === true);
+
+            if (activeSubClassFilters.length > 0) {
+              const itemClass = metadata.properties.itemClass;
+              const itemSubClass = metadata.properties.itemSubClass;
+              let matchesSubClass = false;
+
+              if (itemClass === "Sword") {
+                if ((activeSubClassFilters.includes("sword1h") && itemSubClass === "OneHand") ||
+                    (activeSubClassFilters.includes("sword2h") && itemSubClass === "TwoHand")) {
+                  matchesSubClass = true;
+                }
+              } else if (itemClass === "Axe") {
+                if ((activeSubClassFilters.includes("axe1h") && itemSubClass === "OneHand") ||
+                    (activeSubClassFilters.includes("axe2h") && itemSubClass === "TwoHand")) {
+                  matchesSubClass = true;
+                }
+              } else if (itemClass === "Mace") {
+                if ((activeSubClassFilters.includes("mace1h") && itemSubClass === "OneHand") ||
+                    (activeSubClassFilters.includes("mace2h") && itemSubClass === "TwoHand")) {
+                  matchesSubClass = true;
+                }
+              }
+
+              if (!matchesSubClass) {
+                return false;
+              }
+            }
+          }
+        } else if (metadata.properties.category === "Armor") {
+          // Filter armor classes
+          if (activeCategoryClassFilters?.itemClass) {
+            const armorClasses = ["BodyArmour", "Boots", "Gloves", "Helmet", "Cape"];
+            const activeArmorClasses = Object.keys(activeCategoryClassFilters.itemClass)
+              .filter((key) => armorClasses.includes(key) && activeCategoryClassFilters.itemClass[key] === true);
+
+            if (activeArmorClasses.length > 0 && !activeArmorClasses.includes(metadata.properties.itemClass)) {
+              return false;
+            }
+          }
+        } else if (metadata.properties.category === "OffHand") {
+          // Filter offhand classes
+          if (activeCategoryClassFilters?.itemClass) {
+            const offHandClasses = ["Shield", "Codex"];
+            const activeOffHandClasses = Object.keys(activeCategoryClassFilters.itemClass)
+              .filter((key) => offHandClasses.includes(key) && activeCategoryClassFilters.itemClass[key] === true);
+
+            if (activeOffHandClasses.length > 0 && !activeOffHandClasses.includes(metadata.properties.itemClass)) {
+              return false;
+            }
+          }
+        } else if (metadata.properties.category === "Jewelry") {
+          // Filter jewelry classes
+          if (activeCategoryClassFilters?.itemClass) {
+            const jewelryClasses = ["Ring", "Amulet", "Bracelet"];
+            const activeJewelryClasses = Object.keys(activeCategoryClassFilters.itemClass)
+              .filter((key) => jewelryClasses.includes(key) && activeCategoryClassFilters.itemClass[key] === true);
+
+            if (activeJewelryClasses.length > 0 && !activeJewelryClasses.includes(metadata.properties.itemClass)) {
+              return false;
+            }
+          }
         }
 
         // Damage filter

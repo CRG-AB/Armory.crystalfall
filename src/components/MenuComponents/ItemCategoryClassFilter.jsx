@@ -8,19 +8,6 @@ export const ItemCategoryClassFilter = ({
   isSidebarOpen,
   defaultOpen,
 }) => {
-  // Category --> Sub Category --> Item Class --> Sub Class
-  //////////////////////
-  // <Checkbox
-  //   name="Shotgun"
-  //   onChange={onChange("shotgunFilter"</SubMenu>)}
-  //   checked={shotgunFilter}
-  // />
-  /////////</div>/////////////
-  // 3 steps to create a filter
-  // 1. useState
-  // 2. useEffect
-  // 3. JSX
-
   // Category
   const [armorFilter, setArmorFilter] = useState(false);
   const [weaponFilter, setWeaponFilter] = useState(false);
@@ -57,6 +44,64 @@ export const ItemCategoryClassFilter = ({
   const [mace2hFilter, setMace2hFilter] = useState(false);
   const [sword1hFilter, setSword1hFilter] = useState(false);
   const [sword2hFilter, setSword2hFilter] = useState(false);
+
+  // Clear functions for each category's children
+  const clearArmorChildren = () => {
+    setBodyFilter(false);
+    setBootsFilter(false);
+    setGlovesFilter(false);
+    setHeadFilter(false);
+    setCapeFilter(false);
+  };
+
+  const clearWeaponChildren = () => {
+    setMeleeFilter(false);
+    setRangedFilter(false);
+    clearMeleeChildren();
+    clearRangedChildren();
+  };
+
+  const clearOffHandChildren = () => {
+    setShieldFilter(false);
+    setCodexFilter(false);
+  };
+
+  const clearJewelryChildren = () => {
+    setRingFilter(false);
+    setAmuletFilter(false);
+    setBraceletFilter(false);
+  };
+
+  const clearMeleeChildren = () => {
+    setAxeFilter(false);
+    setMaceFilter(false);
+    setSwordFilter(false);
+    setDaggerFilter(false);
+    clearAxeChildren();
+    clearMaceChildren();
+    clearSwordChildren();
+  };
+
+  const clearRangedChildren = () => {
+    setPistolFilter(false);
+    setRifleFilter(false);
+    setShotgunFilter(false);
+  };
+
+  const clearAxeChildren = () => {
+    setAxe1hFilter(false);
+    setAxe2hFilter(false);
+  };
+
+  const clearMaceChildren = () => {
+    setMace1hFilter(false);
+    setMace2hFilter(false);
+  };
+
+  const clearSwordChildren = () => {
+    setSword1hFilter(false);
+    setSword2hFilter(false);
+  };
 
   useEffect(() => {
     const filters = {
@@ -136,10 +181,14 @@ export const ItemCategoryClassFilter = ({
       {/* ARMOR */}
       <Checkbox
         name="Armor"
-        onChange={() => setArmorFilter(!armorFilter)}
+        onChange={() => {
+          const newValue = !armorFilter;
+          setArmorFilter(newValue);
+          if (!newValue) clearArmorChildren();
+        }}
         checked={armorFilter}
       />
-      {armorFilter ? (
+      {armorFilter && (
         <>
           <Checkbox
             name="Body"
@@ -172,30 +221,42 @@ export const ItemCategoryClassFilter = ({
             level={1}
           />
         </>
-      ) : null}
+      )}
       {/* WEAPON */}
       <Checkbox
         name="Weapon"
-        onChange={() => setWeaponFilter(!weaponFilter)}
+        onChange={() => {
+          const newValue = !weaponFilter;
+          setWeaponFilter(newValue);
+          if (!newValue) clearWeaponChildren();
+        }}
         checked={weaponFilter}
       />
-      {weaponFilter ? (
+      {weaponFilter && (
         <>
           <Checkbox
             name="Melee"
-            onChange={() => setMeleeFilter(!meleeFilter)}
+            onChange={() => {
+              const newValue = !meleeFilter;
+              setMeleeFilter(newValue);
+              if (!newValue) clearMeleeChildren();
+            }}
             checked={meleeFilter}
             level={1}
           />
-          {meleeFilter ? (
+          {meleeFilter && (
             <>
               <Checkbox
                 name="Axe"
-                onChange={() => setAxeFilter(!axeFilter)}
+                onChange={() => {
+                  const newValue = !axeFilter;
+                  setAxeFilter(newValue);
+                  if (!newValue) clearAxeChildren();
+                }}
                 checked={axeFilter}
                 level={2}
               />
-              {axeFilter ? (
+              {axeFilter && (
                 <>
                   <Checkbox
                     name="1h"
@@ -203,7 +264,6 @@ export const ItemCategoryClassFilter = ({
                     checked={axe1hFilter}
                     level={3}
                   />
-
                   <Checkbox
                     name="2h"
                     onChange={() => setAxe2hFilter(!axe2hFilter)}
@@ -211,7 +271,7 @@ export const ItemCategoryClassFilter = ({
                     level={3}
                   />
                 </>
-              ) : null}
+              )}
               <Checkbox
                 name="Dagger"
                 onChange={() => setDaggerFilter(!daggerFilter)}
@@ -220,11 +280,15 @@ export const ItemCategoryClassFilter = ({
               />
               <Checkbox
                 name="Mace"
-                onChange={() => setMaceFilter(!maceFilter)}
+                onChange={() => {
+                  const newValue = !maceFilter;
+                  setMaceFilter(newValue);
+                  if (!newValue) clearMaceChildren();
+                }}
                 checked={maceFilter}
                 level={2}
               />
-              {maceFilter ? (
+              {maceFilter && (
                 <>
                   <Checkbox
                     name="1h"
@@ -239,14 +303,18 @@ export const ItemCategoryClassFilter = ({
                     level={3}
                   />
                 </>
-              ) : null}
+              )}
               <Checkbox
                 name="Sword"
-                onChange={() => setSwordFilter(!swordFilter)}
+                onChange={() => {
+                  const newValue = !swordFilter;
+                  setSwordFilter(newValue);
+                  if (!newValue) clearSwordChildren();
+                }}
                 checked={swordFilter}
                 level={2}
               />
-              {swordFilter ? (
+              {swordFilter && (
                 <>
                   <Checkbox
                     name="1h"
@@ -261,16 +329,20 @@ export const ItemCategoryClassFilter = ({
                     level={3}
                   />
                 </>
-              ) : null}
+              )}
             </>
-          ) : null}
+          )}
           <Checkbox
             name="Ranged"
-            onChange={() => setRangedFilter(!rangedFilter)}
+            onChange={() => {
+              const newValue = !rangedFilter;
+              setRangedFilter(newValue);
+              if (!newValue) clearRangedChildren();
+            }}
             checked={rangedFilter}
             level={1}
           />
-          {rangedFilter ? (
+          {rangedFilter && (
             <>
               <Checkbox
                 name="Pistol"
@@ -291,16 +363,20 @@ export const ItemCategoryClassFilter = ({
                 level={2}
               />
             </>
-          ) : null}
+          )}
         </>
-      ) : null}
+      )}
       {/* OFF-HAND */}
       <Checkbox
         name="Off-Hand"
-        onChange={() => setOffHandFilter(!offHandFilter)}
+        onChange={() => {
+          const newValue = !offHandFilter;
+          setOffHandFilter(newValue);
+          if (!newValue) clearOffHandChildren();
+        }}
         checked={offHandFilter}
       />
-      {offHandFilter ? (
+      {offHandFilter && (
         <>
           <Checkbox
             name="Shield"
@@ -315,14 +391,18 @@ export const ItemCategoryClassFilter = ({
             level={1}
           />
         </>
-      ) : null}
+      )}
       {/* JEWELRY */}
       <Checkbox
         name="Jewelry"
-        onChange={() => setJewelryFilter(!jewelryFilter)}
+        onChange={() => {
+          const newValue = !jewelryFilter;
+          setJewelryFilter(newValue);
+          if (!newValue) clearJewelryChildren();
+        }}
         checked={jewelryFilter}
       />
-      {jewelryFilter ? (
+      {jewelryFilter && (
         <>
           <Checkbox
             name="Ring"
@@ -343,7 +423,7 @@ export const ItemCategoryClassFilter = ({
             level={1}
           />
         </>
-      ) : null}
+      )}
     </SubMenu>
   );
 };
