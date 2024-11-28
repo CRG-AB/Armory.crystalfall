@@ -9,13 +9,15 @@ export async function fetchTokenIds() {
   const tokenCount = await totalCount();
   const url =
     "https://api.testnet.onbeam.com/v2/assets/0x397e9fC82399d17Ee3a99E359Ec64b2B3bb8922d";
-
   const tokenIds = [];
 
   try {
     let continuation = null;
-    for (let i = 0; i < tokenCount; i += 100) {
-      const limit = tokenCount - i > 100 ? 100 : tokenCount - i;
+    do {
+      let limit = 100;
+      if (tokenIds.length + limit > tokenCount) {
+        limit = tokenCount - tokenIds.length;
+      }
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -33,10 +35,11 @@ export async function fetchTokenIds() {
           includeAttributes: false,
           attributes: null,
           sortDirection: "desc",
-          sortBy: "updatedAt",
+          sortBy: "mintedAt",
           limit: limit,
         }),
       });
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error response:", errorData);
@@ -45,10 +48,15 @@ export async function fetchTokenIds() {
 
       const responseData = await response.json();
       const data = responseData.data;
-      // Assuming the response structure contains tokenIds, adjust the return statement accordingly
       tokenIds.push(...data.map((token) => token.assetId));
+
+      // Update continuation token for next request
       continuation = responseData.continuation;
-    }
+
+      // Break if no more data to fetch
+      if (!continuation) break;
+    } while (tokenIds.length < tokenCount);
+
     return tokenIds;
   } catch (error) {
     console.error("Error fetching token IDs:", error);

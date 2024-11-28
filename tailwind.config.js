@@ -11,6 +11,8 @@ module.exports = {
         page: "#AE9877",
         text: "#C7C4C3",
         cyan: "#10CAE0",
+        gold: "#B19670",
+        darkGold: "#63594A",
         b7a99c: "#b7a99c",
         e7e8e8: "#e7e8e8",
       },

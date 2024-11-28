@@ -26,7 +26,7 @@ export const MobileHeader = () => {
         ></div>
       )}
       <div className="flex items-center">
-        <a href="https://crystalfall.com">
+        <a href="https://armory.crystalfall.com">
           <img src={CrystalFall} alt="Crystalfall Logo" className="h-12" />
         </a>
       </div>

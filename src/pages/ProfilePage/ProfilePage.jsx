@@ -4,11 +4,8 @@ import { ITEMS_CONTRACT } from "../../CONST.js";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 
-import { DisplayToken } from "../../components/ui/DisplayToken.jsx";
-import { Spinner } from "../../components/ui/Spinner.jsx";
-import { SortingSidebar } from "../../components/MenuComponents/SortingSidebar.jsx";
+import { NFTGrid } from "../../components/NFTGrid";
 import { ConnectedWallet } from "../../components/ui/ConnectedWallet.jsx";
-import { ArrowButton } from "../../components/buttons/ArrowButton.jsx";
 import { thirdWebIPFSLink } from "../../services/IPFSLink";
 
 import softLight from "../../img/images/soft-light-fog.webp";
@@ -48,22 +45,6 @@ const Background = styled.div`
   }
 `;
 
-const StyledTokenList = styled.ul`
-  display: grid;
-  justify-content: center;
-  align-content: start;
-  gap: 10px;
-  padding: 50px 30px 90px 30px;
-  width: 100%;
-  overflow: hidden;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
-
-  @media screen and (max-width: 870px) {
-    padding-bottom: 100px;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
-  }
-`;
-
 export const ProfilePage = () => {
   // ADDRESS LOGIC
   const [address, setAddress] = useState(
@@ -83,24 +64,11 @@ export const ProfilePage = () => {
 
   // THIRDWEB
   const { contract: contractItems } = useContract(ITEMS_CONTRACT);
-
   const { data: nfts, isLoading } = useOwnedNFTs(contractItems, address);
 
   const nftsPerPage = 20;
   const [count, setCount] = useState(0);
-  const { data: totalCount } = useTotalCount(contractItems);
-  const hasPreviousPage = count > 0;
-  const hasNextPage = (count + 1) * nftsPerPage < totalCount;
-  const totalPages = Math.ceil(filteredNFTs.length / nftsPerPage);
-  const [allNFTs, setAllNFTs] = useState([]);
-  const [i, setI] = useState(0);
-  const [displayedNfts, setDisplayedNfts] = useState([]);
-
-  useEffect(() => {
-    setDisplayedNfts(
-      filteredNFTs.slice(count * nftsPerPage, (count + 1) * nftsPerPage)
-    );
-  }, [count, filteredNFTs, nfts]);
+  const totalPages = Math.ceil((filteredNFTs?.length || 0) / nftsPerPage);
 
   useEffect(() => {
     window.scrollTo({ top: 100, behavior: "smooth" });
@@ -113,12 +81,6 @@ export const ProfilePage = () => {
           <hr />
           <Background>
             <div className="flex h-full">
-              <SortingSidebar
-                isSidebarOpen={isSidebarOpen}
-                nfts={nfts}
-                setFilteredNFTs={setFilteredNFTs}
-                setIsSidebarOpen={setIsSidebarOpen}
-              />
               <div
                 className="flex items-center flex-col justify-start"
                 style={{
@@ -130,56 +92,15 @@ export const ProfilePage = () => {
                 <div className="flex justify-center mt-8">
                   <ConnectedWallet wallet={address} className="m:scale-50" />
                 </div>
-                {isLoading && address != "undefined" && address != "" ? (
-                  <div className="flex justify-center mt-8">
-                    <Spinner className="mt-12m" />
-                  </div>
-                ) : !nfts && address != "undefined" && address != "" ? (
-                  <div className="flex justify-center font-bold mt-10 w-full">
-                    There are no NFTs associated with your account.
-                  </div>
-                ) : filteredNFTs.length == 0 &&
-                  address != "undefined" &&
-                  address != "" ? (
-                  <div className="flex justify-center font-bold mt-10 w-full">
-                    No NFTs were found matching your current filters.
-                  </div>
-                ) : (
-                  <StyledTokenList>
-                    {displayedNfts.map((token, i) => {
-                      return (
-                        <DisplayToken
-                          name={token.metadata.name}
-                          key={i}
-                          linkTo={`token/${token.metadata.id}`}
-                          img={token.metadata.image}
-                          tokenID={token.metadata.id}
-                        />
-                      );
-                    })}
-                  </StyledTokenList>
-                )}
-                {filteredNFTs.length > 20 ? (
-                  <div className="flex justify-center items-center gap-4 absolute bottom-4 left-[calc(50%-90px)]">
-                    <ArrowButton
-                      direction={"left"}
-                      onClick={() => {
-                        setCount(count - 1);
-                        window.scrollTo({ top: 100, behavior: "smooth" });
-                      }}
-                      disabled={!hasPreviousPage}
-                    />
-                    Page {count + 1} of {totalPages}
-                    <ArrowButton
-                      direction={"right"}
-                      onClick={() => {
-                        setCount(count + 1);
-                        window.scrollTo({ top: 100, behavior: "smooth" });
-                      }}
-                      disabled={!hasNextPage}
-                    />
-                  </div>
-                ) : null}
+                <NFTGrid
+                  nfts={filteredNFTs}
+                  isLoading={isLoading}
+                  animated={true}
+                  count={count}
+                  setCount={setCount}
+                  totalPages={totalPages}
+                  nftsPerPage={nftsPerPage}
+                />
               </div>
             </div>
           </Background>

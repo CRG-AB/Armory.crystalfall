@@ -34,7 +34,7 @@ export const SortingSidebar = ({
     useState([0, 100]); // THIS
   const [damageFilterValue, setDamageFilterValue] = useState([0, 100]); /// DISCUSS THIS
   const [qualityFilterValue, setQualityFilterValue] = useState([1, 5]);
-  const [rangeFilterValue, setRangeFilterValue] = useState([0, 10]); ///// THIS
+  const [rangeFilterValue, setRangeFilterValue] = useState([0, 30]); ///// THIS
   const [attackSpeedFilterValue, setAttackSpeedFilterValue] = useState([0, 10]); ///// THIS
   const [levelFilterValue, setLevelFilterValue] = useState([0, 100]); ///// THIS
   const [checkedDamageType, setCheckedDamageType] = useState({
@@ -73,76 +73,86 @@ export const SortingSidebar = ({
 
   useEffect(() => {
     const filterNFTs = (nfts) => {
-      if (!nfts || activeCategoryClassFilters.length <= 0) return [];
-      let activeCategoryFilters = [];
-      let activeSubCategoryFilters = [];
-      let activeClassFilters = [];
-      let activeSubClassFilters = [];
-      activeCategoryFilters = Object.keys(
-        activeCategoryClassFilters.category
-      ).filter((key) => activeCategoryClassFilters.category[key] === true);
-
-      if (activeCategoryFilters.length > 0) {
-        activeSubCategoryFilters = Object.keys(
-          activeCategoryClassFilters.subCategory
-        ).filter((key) => activeCategoryClassFilters.subCategory[key] === true);
+      if (!nfts) {
+        console.log("[Filter] No NFTs available");
+        return [];
       }
 
-      if (activeCategoryFilters.length > 0) {
-        activeClassFilters = Object.keys(
-          activeCategoryClassFilters.itemClass
-        ).filter((key) => activeCategoryClassFilters.itemClass[key] === true);
-      }
+      // Track removed NFTs and their reasons
+      const removedNFTs = [];
 
-      if (activeClassFilters.length > 0) {
-        activeSubClassFilters = Object.keys(
-          activeCategoryClassFilters.subClass
-        ).filter((key) => activeCategoryClassFilters.subClass[key] === true);
-      }
-      return nfts.filter((nft) => {
+      const filtered = nfts.filter((nft) => {
         const metadata = nft.metadata;
-        if (!metadata.properties) {
+
+        // Check for valid metadata
+        if (!metadata || !metadata.properties) {
+          removedNFTs.push({
+            name: metadata?.name || "Unknown" + ": " + metadata.id,
+            reason: "Missing metadata or properties",
+          });
           return false;
         }
-        // filter by searchTerm
+
+        if (metadata.properties.rarity === "Unique") {
+          return false;
+        }
+
+        // Search term filter
         if (
           searchTerm &&
           !metadata.name.toLowerCase().includes(searchTerm.toLowerCase())
         ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `Search term "${searchTerm}" not found`,
+          });
           return false;
         }
 
         // Filter by Category and Class
+        let activeCategoryFilters = [];
+        let activeSubCategoryFilters = [];
+        let activeClassFilters = [];
+
         // Filter "category"
-        if (
-          activeCategoryFilters.length > 0 &&
-          !activeCategoryFilters.includes(metadata.properties.category)
-        ) {
-          return false;
+        if (activeCategoryClassFilters?.category) {
+          activeCategoryFilters = Object.keys(activeCategoryClassFilters.category)
+            .filter((key) => activeCategoryClassFilters.category[key] === true);
+          
+          if (activeCategoryFilters.length > 0 && !activeCategoryFilters.includes(metadata.properties.category)) {
+            return false;
+          }
         }
 
         // Filter "subCategory"
-        if (
-          activeSubCategoryFilters.length > 0 &&
-          !activeSubCategoryFilters.includes(metadata.properties.subCategory) &&
-          metadata.properties.category == "Weapon"
-        ) {
-          // Filter "itemClass"
-          if (
-            activeClassFilters.length > 0 &&
-            !activeClassFilters.includes(metadata.properties.itemClass)
-          ) {
+        if (activeCategoryFilters.length > 0 && activeCategoryClassFilters?.subCategory) {
+          activeSubCategoryFilters = Object.keys(activeCategoryClassFilters.subCategory)
+            .filter((key) => activeCategoryClassFilters.subCategory[key] === true);
+          
+          if (activeSubCategoryFilters.length > 0 && !activeSubCategoryFilters.includes(metadata.properties.subCategory)) {
             return false;
           }
-          return false;
+        }
+
+        // Filter "class"
+        if (activeCategoryFilters.length > 0 && 
+            activeSubCategoryFilters.length > 0 && 
+            activeCategoryClassFilters?.itemClass) {
+          activeClassFilters = Object.keys(activeCategoryClassFilters.itemClass)
+            .filter((key) => activeCategoryClassFilters.itemClass[key] === true);
+          
+          if (activeClassFilters.length > 0 && !activeClassFilters.includes(metadata.properties.itemClass)) {
+            return false;
+          }
         }
 
         // Filter "subClass"
-        if (
-          activeCategoryFilters.length > 0 &&
-          activeSubCategoryFilters.length > 0 &&
-          metadata.properties.category == "Weapon"
-        ) {
+        if (activeCategoryFilters.length > 0 && 
+            activeSubCategoryFilters.length > 0 && 
+            activeCategoryClassFilters?.subClass) {
+          let activeSubClassFilters = Object.keys(activeCategoryClassFilters.subClass)
+            .filter((key) => activeCategoryClassFilters.subClass[key] === true);
+
           let bool = true;
           if (activeSubClassFilters.length > 0) {
             switch (metadata.properties.itemClass) {
@@ -192,126 +202,150 @@ export const SortingSidebar = ({
           }
           if (!bool) return false;
         }
-        // Filter by LevelRequirement
-        if (levelRequirementFilterValue) {
-          if (
-            levelRequirementFilterValue[0] >
-              metadata.properties.levelRequirement ||
-            levelRequirementFilterValue[1] <
-              metadata.properties.levelRequirement
-          ) {
-            return false;
-          }
-        }
 
-        // Filter by DamageFilterValue
+        // Damage filter
         if (damageFilterValue) {
+          // Calculate total max damage from all damage types
+          const totalMaxDamage = [
+            metadata.properties.physicalDamageMax || 0,
+            metadata.properties.fireDamageMax || 0,
+            metadata.properties.coldDamageMax || 0,
+            metadata.properties.lightningDamageMax || 0,
+            metadata.properties.aetherDamageMax || 0,
+            // Include the generic damageMax as well
+            metadata.properties.damageMax || 0,
+          ].reduce((sum, damage) => sum + damage, 0);
+
           if (
-            damageFilterValue[0] > metadata.properties.damageMax || // If the min damage is greater than the max damage
-            damageFilterValue[1] < metadata.properties.damageMax // If the max damage is less than the min damage
+            damageFilterValue[0] > totalMaxDamage ||
+            damageFilterValue[1] < totalMaxDamage
           ) {
+            removedNFTs.push({
+              name: metadata.name + ": " + metadata.id,
+              reason: `Total damage ${totalMaxDamage} outside range [${damageFilterValue.join(
+                "-"
+              )}]`,
+            });
             return false;
           }
         }
-        // Filter by QualityFilterValue
+
+        // Quality filter
         if (
-          qualityFilterValue[0] > metadata.properties.quality ||
-          qualityFilterValue[1] < metadata.properties.quality
+          metadata.properties.quality &&
+          (qualityFilterValue[0] > metadata.properties.quality ||
+            qualityFilterValue[1] < metadata.properties.quality)
         ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `Quality ${
+              metadata.properties.quality
+            } outside range [${qualityFilterValue.join("-")}]`,
+          });
           return false;
         }
 
-        // Filter by RangeFilterValue
+        // Range filter
         if (
-          rangeFilterValue[0] > metadata.properties.range ||
-          rangeFilterValue[1] < metadata.properties.range
+          metadata.properties.range &&
+          (rangeFilterValue[0] > metadata.properties.range ||
+            rangeFilterValue[1] < metadata.properties.range)
         ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `Range ${
+              metadata.properties.range
+            } outside range [${rangeFilterValue.join("-")}]`,
+          });
           return false;
         }
 
-        // Filter by AttackSpeedFilterValue
+        // Attack Speed filter
         if (
-          attackSpeedFilterValue[0] > metadata.properties.attackSpeed ||
-          attackSpeedFilterValue[1] < metadata.properties.attackSpeed
+          metadata.properties.attackSpeed &&
+          (attackSpeedFilterValue[0] > metadata.properties.attackSpeed ||
+            attackSpeedFilterValue[1] < metadata.properties.attackSpeed)
         ) {
-          return false;
-        }
-        // Filter by LevelFilterValue
-        if (
-          levelFilterValue[0] > metadata.properties.level ||
-          levelFilterValue[1] < metadata.properties.level
-        ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `Attack Speed ${
+              metadata.properties.attackSpeed
+            } outside range [${attackSpeedFilterValue.join("-")}]`,
+          });
           return false;
         }
 
-        // Filter by checkedDamageType
-        const checkedDamageTypes = Object.keys(checkedDamageType).filter(
-          (key) => checkedDamageType[key] == true
-        );
+        // Level filter
+        if (
+          metadata.properties.level &&
+          (levelFilterValue[0] > metadata.properties.level ||
+            levelFilterValue[1] < metadata.properties.level)
+        ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `Level ${
+              metadata.properties.level
+            } outside range [${levelFilterValue.join("-")}]`,
+          });
+          return false;
+        }
+
+        // Damage Type filter
+        const checkedDamageTypes = Object.entries(checkedDamageType)
+          .filter(([_, checked]) => checked)
+          .map(([type]) => type);
+
         if (
           checkedDamageTypes.length > 0 &&
           !checkedDamageTypes.includes(metadata.properties.damageType)
         ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `Damage type ${
+              metadata.properties.damageType
+            } not in [${checkedDamageTypes.join(", ")}]`,
+          });
           return false;
         }
 
-        // Filter by checkedRarity
-        const checkedRarities = Object.keys(checkedRarity).filter(
-          (key) => checkedRarity[key] == true
-        );
+        // Rarity filter
+        const checkedRarities = Object.entries(checkedRarity)
+          .filter(([_, checked]) => checked)
+          .map(([type]) => type);
+
         if (
           checkedRarities.length > 0 &&
           !checkedRarities.includes(metadata.properties.rarity)
         ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `Rarity ${
+              metadata.properties.rarity
+            } not in [${checkedRarities.join(", ")}]`,
+          });
           return false;
         }
 
-        // Filter by checkedItemSeason
-        // NOT YET IMPLEMENTED /////
-        //////////////////////////////
-
-        //////////////////////////////
-        // Filter by modsFilterArray
-        /////////////////////////////
-        if (modsFilterArray.length > 0) {
-          // combine list of all nfts mods: metadata.properties.mods, metadata.properties.implicitMods, metadata.properties.aetherealMods
-          const allItemMods = [
-            metadata.properties.mods,
-            metadata.properties.implicitMods,
-            metadata.properties.aetherealMods,
-          ].join(", ");
-          // If the NFT does not have any mods, exclude it
-          if (!allItemMods) {
-            return false;
-          }
-          // format the mods like this: [{mod: "modName", value: int("value")}{mod: "modName2", value: "value2"}} and store them in an array, Nfts mods come like this: " +value modName,+value2 modName2, +value3 modName3"
-          const formattedItemMods = allItemMods.split(",").map((mod) => {
-            const splitMod = mod.trim().split(" ");
-            return {
-              mod: splitMod.slice(1).join(""),
-              value: parseInt(splitMod[0]),
-            };
-          });
-          // If the NFT does not have all the mods in the modList, exclude it. Check the min and max values of the mods
-          if (
-            !modsFilterArray.every((filterMod) => {
-              return formattedItemMods.some(
-                (itemMod) =>
-                  filterMod.mod == itemMod.mod &&
-                  (filterMod.min == "" || itemMod.value >= filterMod.min) &&
-                  (filterMod.max == "" || itemMod.value <= filterMod.max)
-              );
-            })
-          ) {
-            return false;
-          }
-        }
-        // If the NFT does not have all the mods in the modList, exclude it. Check the min and max values of the mods
-
-        // If none of the filters excluded the NFT, include it in the results
         return true;
       });
+
+      // Group removed NFTs by reason
+      const groupedRemovals = removedNFTs.reduce((acc, item) => {
+        acc[item.reason] = acc[item.reason] || [];
+        acc[item.reason].push(item.name);
+        return acc;
+      }, {});
+
+      console.log("[Filter] Filtering complete:", {
+        totalNFTs: nfts.length,
+        filtered: filtered.length,
+        removedNFTs: nfts.length - filtered.length,
+        removalReasons: groupedRemovals,
+      });
+
+      return filtered;
     };
+
     setFilteredNFTs(filterNFTs(nfts));
   }, [
     nfts,
@@ -326,7 +360,6 @@ export const SortingSidebar = ({
     checkedDamageType,
     checkedRarity,
     modsFilterArray,
-    // checkedItemSeason,
   ]);
 
   const menuItemStyles = {
