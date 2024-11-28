@@ -1,9 +1,8 @@
 import React from "react";
 import { styled, keyframes } from "styled-components";
-import CardBackground from "../img/ui/Card2.svg";
+import CardBackground from "../img/ui/Card3.png";
 import horisontalLine from "../img/ui/Line-fade-300.webp";
-import downArrowLine from "../img/ui/downArrowLine.webp";
-import upArrowLine from "../img/ui/upArrowLine.webp";
+import downArrowLine from "../img/ui/LineThing.svg";
 import { useNavigate } from "react-router-dom";
 import { ITEMS_CONTRACT } from "../CONST.js";
 
@@ -60,7 +59,7 @@ const TraitBox = styled.div`
   height: 45px;
   margin: 10px 10px;
   padding: 12px 15px 0px 15px;
-  color: #dcc097;
+  color: #d3c4ae;
   position: relative;
   background: linear-gradient(360deg, #5b412e 0%, rgba(51, 46, 41, 0) 100%);
 
@@ -82,11 +81,12 @@ const TraitBox = styled.div`
 const Vitals = styled.div`
   font-size: 1.2rem;
   height: 30px;
-  margin: 3px;
   background-color: #e6e6e6;
   padding: 0;
-  border-bottom: 2px solid #77716e;
+  border-bottom: 2px solid #63594a;
+  border-top: 2px solid #464451;
   padding-left: 20px;
+  margin: 4px 0px;
   color: black;
   background: #e6e6e6;
   background: repeating-radial-gradient(
@@ -202,7 +202,13 @@ const modTypes = [
   { type: "rareMods", color: "blue" },
   { type: "socketMods", color: "blue" },
   { type: "uncommonMods", color: "blue" },
+  { type: "nodeMods", color: "blue" },
 ];
+
+const formatSkillTags = (tags) => {
+  if (!tags) return [];
+  return tags.split(", ").map((tag) => tag.trim());
+};
 
 export const ItemCard = ({ token }) => {
   console.log(token);
@@ -215,7 +221,9 @@ export const ItemCard = ({ token }) => {
   let rareMods = [];
   let socketMods = [];
   let uncommonMods = [];
+  let nodeMods = [];
   let requirements = [];
+  let skillTags = [];
   let affixes = {};
 
   if (token.metadata && token.metadata.properties) {
@@ -234,6 +242,8 @@ export const ItemCard = ({ token }) => {
           "uncommonMods",
           "rareMods",
           "socketMods",
+          "nodeMods",
+          "skillTags",
         ].includes(trait.trait_type) &&
         trait.trait_type !== "attributeRequirements" &&
         trait.trait_type !== "levelRequirement" &&
@@ -248,11 +258,18 @@ export const ItemCard = ({ token }) => {
     }
 
     affixes = modTypes.reduce((acc, { type }) => {
-      acc[type] =
-        semanticToken
-          .find((trait) => trait.trait_type === type)
-          ?.value.split(",")
-          .filter((mod) => mod && mod.trim() !== "") || [];
+      if (type === "nodeMods") {
+        acc[type] =
+          token.metadata.properties[type]
+            ?.split(",")
+            .filter((mod) => mod && mod.trim() !== "") || [];
+      } else {
+        acc[type] =
+          semanticToken
+            .find((trait) => trait.trait_type === type)
+            ?.value?.split(",")
+            .filter((mod) => mod && mod.trim() !== "") || [];
+      }
       return acc;
     }, {});
 
@@ -261,6 +278,8 @@ export const ItemCard = ({ token }) => {
     rareMods = affixes.rareMods;
     socketMods = affixes.socketMods;
     uncommonMods = affixes.uncommonMods;
+    nodeMods = affixes.nodeMods;
+    skillTags = formatSkillTags(token.metadata.properties.skillTags);
 
     requirements = semanticToken
       .filter(
@@ -277,13 +296,11 @@ export const ItemCard = ({ token }) => {
         if (trait.trait_type.includes("levelRequirement"))
           return { ...trait, value: `Level ${trait.value}` };
         if (trait.trait_type.includes("attributeRequirements")) {
-          // Parse the attribute requirements
           const attrs = trait.value.split(",").map((attr) => {
             const [name, value] = attr.trim().split(" ");
             return { name, value: parseInt(value) };
           });
 
-          // Filter out attributes with value 0 and format them
           const validAttrs = attrs
             .filter((attr) => attr.value > 0)
             .map((attr) => `${attr.name} ${attr.value}`);
@@ -292,7 +309,7 @@ export const ItemCard = ({ token }) => {
         }
         return trait;
       })
-      .filter((trait) => trait.value && trait.value !== ""); // Remove empty requirements
+      .filter((trait) => trait.value && trait.value !== "");
   }
   return (
     <StyledCard>
@@ -312,16 +329,34 @@ export const ItemCard = ({ token }) => {
         <div className="relative flex flex-col justify-between w-[450px]">
           <div>
             <img src={horisontalLine} className="w-full h-1 my-2" />
-            <h3 className="mt-2">
-              <b>Requirements: </b>
-              {requirements.map((trait, i) => (
-                <span key={i}>
-                  {trait.value}
-                  {i < requirements.length - 1 ? ", " : ""}
-                </span>
-              ))}
-            </h3>
-            <div className="mt-6">
+            {requirements.length > 0 && (
+              <h3 className="mt-2">
+                <b>Requirements: </b>
+                {requirements.map((trait, i) => (
+                  <span key={i}>
+                    {trait.value}
+                    {i < requirements.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </h3>
+            )}
+            {skillTags.length > 0 && (
+              <div className="mt-4">
+                <p className="text-gold text-xs mb-1">SKILL TAGS:</p>
+                <div className="flex flex-wrap gap-2">
+                  {skillTags.map((tag, i) => (
+                    <span
+                      key={i}
+                      className="text-blue-300 bg-blue-900/30 px-2 py-1 rounded"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <img src={horisontalLine} alt="" className="my-2" />
+              </div>
+            )}
+            <div className="mt-6 pr-8">
               {modTypes.map(({ type, color }) => {
                 const affixArray = affixes[type];
                 return (
@@ -356,16 +391,20 @@ export const ItemCard = ({ token }) => {
           }
         ></div>
       </StyledImageDiv>
-      <img src={upArrowLine} className="w-full h-10 mb-2" />
-      <div className="bg-[url('/src/img/ui/vitalsBg.webp')] bg-cover h-62 pt-4">
-        {displayedTraitsUpper.map((trait, i) => {
-          return (
+      <img
+        src={downArrowLine}
+        className="w-4/6 h-10 my-2 transform rotate-180 mx-auto"
+      />
+
+      {displayedTraitsUpper.map((trait, i) => {
+        return (
+          <div className="bg-[url('/src/img/ui/ListItem.png')] bg-cover">
             <Vitals key={i}>
               {formatTraitType(trait.trait_type)}: {trait.value}
             </Vitals>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
       <StyledMetadata>
         {displayedTraitsLower
           .filter(
@@ -378,7 +417,10 @@ export const ItemCard = ({ token }) => {
             </TraitBox>
           ))}
       </StyledMetadata>
-      <img src={downArrowLine} className="w-full h-10" />
+      <img
+        src={downArrowLine}
+        className="w-4/6 h-10 mb-2 transform rotate-180 mx-auto"
+      />
       <p className="text-red-700 text-center absolute bottom-14 left-1/2 -translate-x-1/2">
         All NFTs exist solely on the Testnet and have no real value
       </p>

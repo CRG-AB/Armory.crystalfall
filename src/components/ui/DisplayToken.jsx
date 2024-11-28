@@ -2,15 +2,14 @@ import { styled } from "styled-components";
 import React, { useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 
-import horisontalLine from "../../img/ui/Line-fade-300.webp";
-import CardBackground from "../../img/ui/big-text-box.webp";
+import horisontalLine from "../../img/ui/LineThing.svg";
+import CardBackground from "../../img/ui/small_card.png";
 import { motion } from "framer-motion";
 
 const StyledImg = styled.img`
   width: 160px;
   margin-top: 15px;
-  transform: scaleY(5) scaleX(1.1);
-  filter: brightness(1.7) contrast(1.5);
+  filter: brightness(1.2) contrast(1.5);
   transition: 0.5s ease;
 `;
 const StyledP = styled.p`
@@ -23,12 +22,12 @@ const StyledP = styled.p`
 `;
 
 const StyledDiv = styled.div`
-  height: 251px;
+  height: 250px;
   width: 200px;
   flex-direction: column;
   transform-origin: top left;
   background-image: url(${CardBackground});
-  background-size: contain;
+  background-size: cover;
   padding: 30px 20px 20px;
   border-radius: 3px;
   transition: 0.5s ease;
