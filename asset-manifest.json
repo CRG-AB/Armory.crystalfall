@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.64778ef6.css",
-    "main.js": "/static/js/main.c0fe5c3e.js",
+    "main.js": "/static/js/main.bfeb7506.js",
     "static/js/2488.e527a4d6.chunk.js": "/static/js/2488.e527a4d6.chunk.js",
     "static/js/1433.f8f9686f.chunk.js": "/static/js/1433.f8f9686f.chunk.js",
     "static/js/9435.0f2b409c.chunk.js": "/static/js/9435.0f2b409c.chunk.js",
@@ -129,13 +129,13 @@
     "static/media/stylized-button.svg": "/static/media/stylized-button.3c4ceabcff1218db00a6.svg",
     "static/media/node-active1.webp": "/static/media/node-active1.e9995e169496a2ff2222.webp",
     "static/media/node-default1.webp": "/static/media/node-default1.bc97ceb92b43c1cefc96.webp",
-    "static/media/crg-logo.webp": "/static/media/crg-logo.baa679325db9fad353cd.webp",
     "static/media/snz-logo.png": "/static/media/snz-logo.c9311c4df4a022d1749d.png",
     "static/media/mc-logo.png": "/static/media/mc-logo.3f6958c5c65e1d0e8899.png",
     "static/media/LineThing.svg": "/static/media/LineThing.f654a38ffffc8be42c6ebdfdcb3e5f24.svg",
     "static/media/expandable.webp": "/static/media/expandable.ad2623997d8eb2e9360b.webp",
     "static/media/separator-line.svg": "/static/media/separator-line.e471fe6e6e43b47961a224fb409e2880.svg",
     "static/media/epicLogoWhite.webp": "/static/media/epicLogoWhite.d3556aa5aab1b2e1ad99.webp",
+    "static/media/crg-logo-tmp-2.png": "/static/media/crg-logo-tmp-2.f43297eff8d41f6c6a91.png",
     "static/media/arrow-btn-hover-up.webp": "/static/media/arrow-btn-hover-up.d6fb5cc61fbbfb2bb279.webp",
     "static/media/arrow-btn-default-up.webp": "/static/media/arrow-btn-default-up.9ba7e2ae80038674c31a.webp",
     "static/media/Button_Highlight.svg": "/static/media/Button_Highlight.50a2dc95dea74b69fba2.svg",
@@ -153,7 +153,7 @@
     "static/media/facebook.svg": "/static/media/facebook.2abc8a7d3b4b6a3b14a541e52e76b7de.svg",
     "static/media/x.svg": "/static/media/x.1cee4f0245bcd2b505df2d03cb94094b.svg",
     "main.64778ef6.css.map": "/static/css/main.64778ef6.css.map",
-    "main.c0fe5c3e.js.map": "/static/js/main.c0fe5c3e.js.map",
+    "main.bfeb7506.js.map": "/static/js/main.bfeb7506.js.map",
     "2488.e527a4d6.chunk.js.map": "/static/js/2488.e527a4d6.chunk.js.map",
     "1433.f8f9686f.chunk.js.map": "/static/js/1433.f8f9686f.chunk.js.map",
     "9435.0f2b409c.chunk.js.map": "/static/js/9435.0f2b409c.chunk.js.map",
@@ -223,6 +223,6 @@
   },
   "entrypoints": [
     "static/css/main.64778ef6.css",
-    "static/js/main.c0fe5c3e.js"
+    "static/js/main.bfeb7506.js"
   ]
 }
