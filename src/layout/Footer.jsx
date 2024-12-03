@@ -14,7 +14,7 @@ import microsoft from "../img/crg/partners/microsoft-logo.png";
 import coinfund from "../img/crg/partners/coinfund-logo.png";
 import seven from "../img/crg/partners/7-logo.png";
 
-import crg from "../img/crg/crg-logo.webp";
+import crg from "../img/crg/crg-logo-tmp-2.png";
 import separatorLine from "../img/ui/separator-line.svg";
 
 export const Footer = () => {
@@ -111,7 +111,7 @@ export const Footer = () => {
             <p>CRG AB</p>
             <p>Company Reg nr: 559310-6023</p>
             <p>VAT nr: SE559310602301</p>
-            <p>Vasagatan 6, 90329 UMEÅ, Sweden</p>
+            <p>Östra Rådhusgatan 6, 90326 UMEÅ, Sweden</p>
           </div>
         </div>
         <div className="flex justify-between items-center">

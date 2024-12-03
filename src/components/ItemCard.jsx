@@ -50,9 +50,10 @@ const StyledImage = styled.img`
 const StyledMetadata = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
   justify-content: center;
   margin: 10px 0;
+  transform: translateZ(0);
+  will-change: transform;
 `;
 
 const TraitBox = styled.div`
@@ -62,6 +63,8 @@ const TraitBox = styled.div`
   color: #d3c4ae;
   position: relative;
   background: linear-gradient(360deg, #5b412e 0%, rgba(51, 46, 41, 0) 100%);
+  transform-origin: center center;
+  will-change: transform;
 
   &::after {
     content: "";
@@ -197,11 +200,11 @@ const formatTraitType = (text) => {
 };
 
 const modTypes = [
-  { type: "aetherealMods", color: "blue" },
   { type: "implicitMods", color: "blue" },
-  { type: "rareMods", color: "blue" },
-  { type: "socketMods", color: "blue" },
   { type: "uncommonMods", color: "blue" },
+  { type: "rareMods", color: "blue" },
+  { type: "aetherealMods", color: "blue" },
+  { type: "socketMods", color: "blue" },
   { type: "nodeMods", color: "blue" },
 ];
 
@@ -238,9 +241,9 @@ export const ItemCard = ({ token }) => {
         trait.trait_type !== "Damage" &&
         ![
           "implicitMods",
-          "aetherealMods",
           "uncommonMods",
           "rareMods",
+          "aetherealMods",
           "socketMods",
           "nodeMods",
           "skillTags",

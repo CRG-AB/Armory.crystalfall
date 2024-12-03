@@ -116,11 +116,15 @@ export const SortingSidebar = ({
 
         // Filter "category"
         if (activeCategoryClassFilters?.category) {
-          activeCategoryFilters = Object.keys(activeCategoryClassFilters.category)
-            .filter((key) => activeCategoryClassFilters.category[key] === true);
-          
+          activeCategoryFilters = Object.keys(
+            activeCategoryClassFilters.category
+          ).filter((key) => activeCategoryClassFilters.category[key] === true);
+
           // If categories are selected, item must match at least one selected category
-          if (activeCategoryFilters.length > 0 && !activeCategoryFilters.includes(metadata.properties.category)) {
+          if (
+            activeCategoryFilters.length > 0 &&
+            !activeCategoryFilters.includes(metadata.properties.category)
+          ) {
             return false;
           }
         }
@@ -129,29 +133,56 @@ export const SortingSidebar = ({
         if (metadata.properties.category === "Weapon") {
           // Filter "subCategory" - Only apply for Weapon category
           if (activeCategoryClassFilters?.subCategory) {
-            activeSubCategoryFilters = Object.keys(activeCategoryClassFilters.subCategory)
-              .filter((key) => activeCategoryClassFilters.subCategory[key] === true);
-            
-            if (activeSubCategoryFilters.length > 0 && !activeSubCategoryFilters.includes(metadata.properties.subCategory)) {
+            activeSubCategoryFilters = Object.keys(
+              activeCategoryClassFilters.subCategory
+            ).filter(
+              (key) => activeCategoryClassFilters.subCategory[key] === true
+            );
+
+            if (
+              activeSubCategoryFilters.length > 0 &&
+              !activeSubCategoryFilters.includes(
+                metadata.properties.subCategory
+              )
+            ) {
               return false;
             }
           }
 
           // Filter weapon classes
           if (activeCategoryClassFilters?.itemClass) {
-            const weaponClasses = ["Axe", "Mace", "Sword", "Dagger", "Pistol", "Rifle", "Shotgun"];
-            const activeWeaponClasses = Object.keys(activeCategoryClassFilters.itemClass)
-              .filter((key) => weaponClasses.includes(key) && activeCategoryClassFilters.itemClass[key] === true);
+            const weaponClasses = [
+              "Axe",
+              "Mace",
+              "Sword",
+              "Dagger",
+              "Pistol",
+              "Rifle",
+              "Shotgun",
+            ];
+            const activeWeaponClasses = Object.keys(
+              activeCategoryClassFilters.itemClass
+            ).filter(
+              (key) =>
+                weaponClasses.includes(key) &&
+                activeCategoryClassFilters.itemClass[key] === true
+            );
 
-            if (activeWeaponClasses.length > 0 && !activeWeaponClasses.includes(metadata.properties.itemClass)) {
+            if (
+              activeWeaponClasses.length > 0 &&
+              !activeWeaponClasses.includes(metadata.properties.itemClass)
+            ) {
               return false;
             }
           }
 
           // Filter weapon subclasses
           if (activeCategoryClassFilters?.subClass) {
-            const activeSubClassFilters = Object.keys(activeCategoryClassFilters.subClass)
-              .filter((key) => activeCategoryClassFilters.subClass[key] === true);
+            const activeSubClassFilters = Object.keys(
+              activeCategoryClassFilters.subClass
+            ).filter(
+              (key) => activeCategoryClassFilters.subClass[key] === true
+            );
 
             if (activeSubClassFilters.length > 0) {
               const itemClass = metadata.properties.itemClass;
@@ -159,18 +190,30 @@ export const SortingSidebar = ({
               let matchesSubClass = false;
 
               if (itemClass === "Sword") {
-                if ((activeSubClassFilters.includes("sword1h") && itemSubClass === "OneHand") ||
-                    (activeSubClassFilters.includes("sword2h") && itemSubClass === "TwoHand")) {
+                if (
+                  (activeSubClassFilters.includes("sword1h") &&
+                    itemSubClass === "OneHand") ||
+                  (activeSubClassFilters.includes("sword2h") &&
+                    itemSubClass === "TwoHand")
+                ) {
                   matchesSubClass = true;
                 }
               } else if (itemClass === "Axe") {
-                if ((activeSubClassFilters.includes("axe1h") && itemSubClass === "OneHand") ||
-                    (activeSubClassFilters.includes("axe2h") && itemSubClass === "TwoHand")) {
+                if (
+                  (activeSubClassFilters.includes("axe1h") &&
+                    itemSubClass === "OneHand") ||
+                  (activeSubClassFilters.includes("axe2h") &&
+                    itemSubClass === "TwoHand")
+                ) {
                   matchesSubClass = true;
                 }
               } else if (itemClass === "Mace") {
-                if ((activeSubClassFilters.includes("mace1h") && itemSubClass === "OneHand") ||
-                    (activeSubClassFilters.includes("mace2h") && itemSubClass === "TwoHand")) {
+                if (
+                  (activeSubClassFilters.includes("mace1h") &&
+                    itemSubClass === "OneHand") ||
+                  (activeSubClassFilters.includes("mace2h") &&
+                    itemSubClass === "TwoHand")
+                ) {
                   matchesSubClass = true;
                 }
               }
@@ -183,11 +226,25 @@ export const SortingSidebar = ({
         } else if (metadata.properties.category === "Armor") {
           // Filter armor classes
           if (activeCategoryClassFilters?.itemClass) {
-            const armorClasses = ["BodyArmour", "Boots", "Gloves", "Helmet", "Cape"];
-            const activeArmorClasses = Object.keys(activeCategoryClassFilters.itemClass)
-              .filter((key) => armorClasses.includes(key) && activeCategoryClassFilters.itemClass[key] === true);
+            const armorClasses = [
+              "BodyArmour",
+              "Boots",
+              "Gloves",
+              "Helmet",
+              "Cape",
+            ];
+            const activeArmorClasses = Object.keys(
+              activeCategoryClassFilters.itemClass
+            ).filter(
+              (key) =>
+                armorClasses.includes(key) &&
+                activeCategoryClassFilters.itemClass[key] === true
+            );
 
-            if (activeArmorClasses.length > 0 && !activeArmorClasses.includes(metadata.properties.itemClass)) {
+            if (
+              activeArmorClasses.length > 0 &&
+              !activeArmorClasses.includes(metadata.properties.itemClass)
+            ) {
               return false;
             }
           }
@@ -195,10 +252,18 @@ export const SortingSidebar = ({
           // Filter offhand classes
           if (activeCategoryClassFilters?.itemClass) {
             const offHandClasses = ["Shield", "Codex"];
-            const activeOffHandClasses = Object.keys(activeCategoryClassFilters.itemClass)
-              .filter((key) => offHandClasses.includes(key) && activeCategoryClassFilters.itemClass[key] === true);
+            const activeOffHandClasses = Object.keys(
+              activeCategoryClassFilters.itemClass
+            ).filter(
+              (key) =>
+                offHandClasses.includes(key) &&
+                activeCategoryClassFilters.itemClass[key] === true
+            );
 
-            if (activeOffHandClasses.length > 0 && !activeOffHandClasses.includes(metadata.properties.itemClass)) {
+            if (
+              activeOffHandClasses.length > 0 &&
+              !activeOffHandClasses.includes(metadata.properties.itemClass)
+            ) {
               return false;
             }
           }
@@ -206,10 +271,18 @@ export const SortingSidebar = ({
           // Filter jewelry classes
           if (activeCategoryClassFilters?.itemClass) {
             const jewelryClasses = ["Ring", "Amulet", "Bracelet"];
-            const activeJewelryClasses = Object.keys(activeCategoryClassFilters.itemClass)
-              .filter((key) => jewelryClasses.includes(key) && activeCategoryClassFilters.itemClass[key] === true);
+            const activeJewelryClasses = Object.keys(
+              activeCategoryClassFilters.itemClass
+            ).filter(
+              (key) =>
+                jewelryClasses.includes(key) &&
+                activeCategoryClassFilters.itemClass[key] === true
+            );
 
-            if (activeJewelryClasses.length > 0 && !activeJewelryClasses.includes(metadata.properties.itemClass)) {
+            if (
+              activeJewelryClasses.length > 0 &&
+              !activeJewelryClasses.includes(metadata.properties.itemClass)
+            ) {
               return false;
             }
           }
@@ -410,7 +483,7 @@ export const SortingSidebar = ({
       <Expandable
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
-        className="!absolute top-0 left-0 z-10 h-10 w-64 transition-all duration-500 ease-out"
+        className="!absolute top-0 left-0 z-10 h-10 w-64 transition-all duration-500 ease-out block sm:hidden"
       />
       <Sidebar
         backgroundColor="#151419"

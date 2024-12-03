@@ -11,6 +11,8 @@ const StyledImg = styled.img`
   margin-top: 15px;
   filter: brightness(1.2) contrast(1.5);
   transition: 0.5s ease;
+  transform: translateZ(0);
+  will-change: transform;
 `;
 const StyledP = styled.p`
   all: unset;
@@ -31,25 +33,28 @@ const StyledDiv = styled.div`
   padding: 30px 20px 20px;
   border-radius: 3px;
   transition: 0.5s ease;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 
   filter: drop-shadow(0 0 6px #4747477d);
   &:hover {
-    transform: scale(1.02);
+    transform: scale(1.02) translateZ(0);
     color: #e7e8e8;
     cursor: pointer;
     filter: brightness(1.03) contrast(1.05) drop-shadow(0 0 10px #474747d4);
     & > .itemImage {
-      transform: scale(1.05);
+      transform: scale(1.05) translateZ(0);
       filter: brightness(1.1);
     }
   }
   @media screen and (max-width: 870px) {
-    transform: scale(0.75);
+    transform: scale(0.75) translateZ(0);
     margin: 0px;
     &:hover {
-      transform: scale(0.77);
+      transform: scale(0.77) translateZ(0);
       & > .itemImage {
-        transform: scale(1.05);
+        transform: scale(1.05) translateZ(0);
       }
     }
   }

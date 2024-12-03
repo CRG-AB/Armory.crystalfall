@@ -7,8 +7,7 @@ const sdk = new ThirdwebSDK(13337, {
 
 export async function fetchTokenIds() {
   const tokenCount = await totalCount();
-  const url =
-    "https://api.testnet.onbeam.com/v2/assets/0x397e9fC82399d17Ee3a99E359Ec64b2B3bb8922d";
+  const url = `https://api.testnet.onbeam.com/v2/assets/${ITEMS_CONTRACT}`;
   const tokenIds = [];
 
   try {
