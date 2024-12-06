@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.fcde31be.css",
-    "main.js": "/static/js/main.586e752a.js",
+    "main.css": "/static/css/main.36495841.css",
+    "main.js": "/static/js/main.f6c51f53.js",
     "static/js/2488.e527a4d6.chunk.js": "/static/js/2488.e527a4d6.chunk.js",
     "static/js/1433.f8f9686f.chunk.js": "/static/js/1433.f8f9686f.chunk.js",
     "static/js/9435.0f2b409c.chunk.js": "/static/js/9435.0f2b409c.chunk.js",
@@ -116,16 +116,11 @@
     "static/media/box-background-hover.webp": "/static/media/box-background-hover.68ef199d3b62a64d170c.webp",
     "static/media/box-background-selected.webp": "/static/media/box-background-selected.a5fb80dde1dfe0b1434a.webp",
     "static/media/box-background.webp": "/static/media/box-background.7df898e6a5dd5ce2f206.webp",
-    "static/media/box-background-selected-small.webp": "/static/media/box-background-selected-small.571b4de4c30b83d7c53e.webp",
-    "static/media/node-error1.webp": "/static/media/node-error1.d7697c67c0e8097d4e84.webp",
     "static/media/node-active.webp": "/static/media/node-active.39e9b5cc3207296dfb25.webp",
     "static/media/node-hover.webp": "/static/media/node-hover.f73d6884100559520e7f.webp",
     "static/media/node-default.webp": "/static/media/node-default.c5394f5dc2779bbd9bbb.webp",
     "static/media/headline.webp": "/static/media/headline.6fa05f86f6cb9d060e97.webp",
-    "static/media/node-hover1.webp": "/static/media/node-hover1.3f85807e7720d2f5189e.webp",
     "static/media/stylized-button.svg": "/static/media/stylized-button.3c4ceabcff1218db00a6.svg",
-    "static/media/node-active1.webp": "/static/media/node-active1.e9995e169496a2ff2222.webp",
-    "static/media/node-default1.webp": "/static/media/node-default1.bc97ceb92b43c1cefc96.webp",
     "static/media/snz-logo.png": "/static/media/snz-logo.c9311c4df4a022d1749d.png",
     "static/media/mc-logo.png": "/static/media/mc-logo.3f6958c5c65e1d0e8899.png",
     "static/media/LineThing.svg": "/static/media/LineThing.f654a38ffffc8be42c6ebdfdcb3e5f24.svg",
@@ -141,15 +136,14 @@
     "static/media/slick.svg": "/static/media/slick.2630a3e3eab21c607e21.svg",
     "static/media/slick.eot": "/static/media/slick.a4e97f5a2a64f0ab1323.eot",
     "static/media/slick.ttf": "/static/media/slick.c94f7671dcc99dce43e2.ttf",
-    "static/media/removeCursor.webp": "/static/media/removeCursor.643ae683b16b4d985c31.webp",
     "static/media/slick.woff": "/static/media/slick.295183786cd8a1389865.woff",
     "index.html": "/index.html",
     "static/media/discord.svg": "/static/media/discord.61249bcd854d94cdd5c07ec5c353bdea.svg",
     "static/media/youtube.svg": "/static/media/youtube.b2550db688494697ce44c793c26425aa.svg",
     "static/media/facebook.svg": "/static/media/facebook.2abc8a7d3b4b6a3b14a541e52e76b7de.svg",
     "static/media/x.svg": "/static/media/x.1cee4f0245bcd2b505df2d03cb94094b.svg",
-    "main.fcde31be.css.map": "/static/css/main.fcde31be.css.map",
-    "main.586e752a.js.map": "/static/js/main.586e752a.js.map",
+    "main.36495841.css.map": "/static/css/main.36495841.css.map",
+    "main.f6c51f53.js.map": "/static/js/main.f6c51f53.js.map",
     "2488.e527a4d6.chunk.js.map": "/static/js/2488.e527a4d6.chunk.js.map",
     "1433.f8f9686f.chunk.js.map": "/static/js/1433.f8f9686f.chunk.js.map",
     "9435.0f2b409c.chunk.js.map": "/static/js/9435.0f2b409c.chunk.js.map",
@@ -218,7 +212,7 @@
     "6374.1f65891c.chunk.js.map": "/static/js/6374.1f65891c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.fcde31be.css",
-    "static/js/main.586e752a.js"
+    "static/css/main.36495841.css",
+    "static/js/main.f6c51f53.js"
   ]
 }
