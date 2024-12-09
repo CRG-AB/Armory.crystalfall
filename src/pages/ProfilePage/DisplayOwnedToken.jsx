@@ -30,23 +30,16 @@ const StyledCard = styled.div`
   padding: 80px 50px;
   transform: scale(0.8);
   font-size: 1.15rem;
+
+  @media screen and (max-width: 870px) {
+    transform: scale(0.9);
+  }
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  @media screen and (max-width: 870px) {
-    transform: scale(0.5);
-    flex-direction: column;
-  }
-`;
-
-const BigCard = styled.div`
-  margin-top: -100px;
-  @media screen and (max-width: 870px) {
-    margin-top: -400px;
-  }
 `;
 
 export const DisplayOwnedToken = () => {
@@ -97,13 +90,13 @@ export const DisplayOwnedToken = () => {
           exit={{ opacity: 0 }}
         >
           <ContentWrapper>
-            <BigCard>
+            <div>
               <StyledCard>
                 <h1 className="flex w-full h-full justify-center items-center font-bold text-5xl">
                   No NFT found with tokenId: {nft.metadata.id}
                 </h1>
               </StyledCard>
-            </BigCard>
+            </div>
           </ContentWrapper>
         </motion.div>
       </StyledClaimTokenPage>
@@ -119,9 +112,9 @@ export const DisplayOwnedToken = () => {
         exit={{ opacity: 0 }}
       >
         <ContentWrapper>
-          <BigCard>
+          <div>
             <ItemCard token={nft} />
-          </BigCard>
+          </div>
         </ContentWrapper>
       </motion.div>
     </StyledClaimTokenPage>

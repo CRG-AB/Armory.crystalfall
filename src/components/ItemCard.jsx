@@ -1,432 +1,640 @@
 import React from "react";
-import { styled, keyframes } from "styled-components";
-import CardBackground from "../img/ui/Card3.png";
-import horisontalLine from "../img/ui/Line-fade-300.webp";
-import downArrowLine from "../img/ui/LineThing.svg";
-import { useNavigate } from "react-router-dom";
-import { ITEMS_CONTRACT } from "../CONST.js";
-
-const customAnimation = keyframes`
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.02);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-`;
+import { styled } from "styled-components";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ITEMS_CONTRACT } from "../CONST";
+import sphereButton from "../img/buttons/sphere.webp";
 
 const StyledCard = styled.div`
-  height: 1350px;
-  width: 950px;
-  background-image: url(${CardBackground});
-  background-size: contain;
-  background-repeat: no-repeat;
-  padding: 45px 50px;
-  transform: scale(0.8);
-  font-size: 1.15rem;
-  filter: drop-shadow(0 0 20px #a3a3a336);
-`;
-
-const StyledImageDiv = styled.div`
-  padding-top: 70px;
+  width: 360px;
+  background: #161413;
+  padding: 16px;
+  color: #ffd700;
+  font-size: 14px;
+  margin: 0px auto 20px;
   position: relative;
-  display: flex;
-  justify-content: space-between;
-`;
+  font-family: "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0.2px;
+  outline: 1px solid #1d1a15;
+  outline-offset: -1px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3), 0 0 0 2px #313029,
+    0 0 0 3px #22231d, 0 0 0 4px #3d372d, 0 0 0 5px #645a4a, 0 0 0 6px #302c24,
+    0 0 15px rgba(255, 255, 255, 0.15);
 
-const StyledImage = styled.img`
-  height: 400px;
-  transition: 0.3s ease;
-  &:hover {
-    filter: brightness(1.1) contrast(1.1);
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.02;
+    pointer-events: none;
+    background-image: url("https://media.freestocktextures.com/cache/68/ab/68ab077793d210ebc0f2f1b49772afcf.jpg");
+    background-size: cover;
+    background-position: right center;
+    mix-blend-mode: color-dodge;
+    filter: brightness(0.98);
   }
-`;
-
-const StyledMetadata = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 10px 0;
-  transform: translateZ(0);
-  will-change: transform;
-`;
-
-const TraitBox = styled.div`
-  height: 45px;
-  margin: 10px 10px;
-  padding: 12px 15px 0px 15px;
-  color: #d3c4ae;
-  position: relative;
-  background: linear-gradient(360deg, #5b412e 0%, rgba(51, 46, 41, 0) 100%);
-  transform-origin: center center;
-  will-change: transform;
 
   &::after {
     content: "";
     position: absolute;
-    bottom: 3px;
+    top: 0;
     left: 0;
-    right: 0;
-    height: 4px;
-    background-color: #b19670;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at 50% 50%,
+      transparent 0%,
+      rgba(0, 0, 0, 0.7) 100%
+    );
+    mix-blend-mode: multiply;
   }
+`;
+
+const BackButton = styled.button`
+  position: absolute;
+  top: 0;
+  left: 8px;
+  background: transparent;
+  color: #666;
+  border: none;
+  padding: 4px;
+  font-size: 20px;
+  font-weight: 1000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
 
   &:hover {
-    animation: ${customAnimation} 1s ease-in-out;
+    color: #4b87ff;
   }
 `;
 
-const Vitals = styled.div`
-  font-size: 1.2rem;
-  height: 30px;
-  background-color: #e6e6e6;
-  padding: 0;
-  border-bottom: 2px solid #63594a;
-  border-top: 2px solid #464451;
-  padding-left: 20px;
-  margin: 4px 0px;
-  color: black;
-  background: #e6e6e6;
-  background: repeating-radial-gradient(
-    ellipse farthest-corner at center center,
-    #e6e6e6 0%,
-    #694e43 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+const ItemTitle = styled.div`
+  font-size: 24px;
+  color: ${(props) => {
+    switch (props.$rarity) {
+      case "Common":
+        return "#d3c4ae";
+      case "Uncommon":
+        return "#4b87ff";
+      case "Rare":
+        return "#ffd700";
+      case "Unique":
+        return "#ff8c00";
+      case "Sealed Aethereal":
+        return "#00ffff";
+      default:
+        return "#d3c4ae";
+    }
+  }};
+  margin-bottom: 2px;
+  text-align: center;
+  font-weight: 500;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
 `;
 
-const processMetadata = (semanticToken) => {
-  // Common fields across all item types
-  const commonFields = [
-    "season",
-    "originallyMinted",
-    "itemLooted",
-    "category",
-    "subCategory",
-    "itemClass",
-    "itemSubClass",
-    "baseItem",
-    "family",
-    "level",
-    "rarity",
-    "quality",
-  ];
+const SubTitle = styled.div`
+  color: #ffffff;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+`;
+const FormalSubTitle = styled.div`
+  color: #47c1a3;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+`;
 
-  // Equipment specific fields
-  const equipmentFields = [
-    "defense",
-    "maxDurability",
-    "levelRequirement",
-    "classRequirement",
-    "attributeRequirements",
-    "theme",
-    "attackSpeed",
-    "range",
-  ];
+const StatBlock = styled.div`
+  margin-bottom: 12px;
+  line-height: 1.4;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+`;
 
-  // Process common fields
-  const baseMetadata = commonFields.map((field) => ({
-    trait_type: field,
-    value: semanticToken.find((trait) => trait.trait_type === field)?.value,
-  }));
+const StatLine = styled.div`
+  color: #ae946f;
+  font-size: 14px;
 
-  // Process equipment fields
-  const equipmentMetadata = equipmentFields.map((field) => ({
-    trait_type: field,
-    value: processEquipmentField(
-      semanticToken.find((trait) => trait.trait_type === field)?.value
-    ),
-  }));
+  span.value {
+    color: #ffd700;
+  }
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+`;
 
-  // Process damage fields if they exist
-  const damageMetadata = processDamageFields(semanticToken);
+const WeaponTypeLine = styled(StatLine)`
+  margin-bottom: 4px;
+  color: #78674e;
+  font-weight: 500;
+`;
 
-  return [...baseMetadata, ...equipmentMetadata, ...damageMetadata].filter(
-    (field) => isValidValue(field.value)
-  );
-};
+const StatAndImageContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+  margin: 12px 0;
+`;
 
-const processEquipmentField = (value) => {
-  if (!value || value === "") return null;
-  return value;
-};
+const ImageContainer = styled.div`
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+`;
 
-const processDamageFields = (semanticToken) => {
-  const damageTypes = ["physical", "lightning", "fire", "cold", "aether"];
-  return damageTypes
-    .map((type) => {
-      const min = semanticToken.find(
-        (trait) => trait.trait_type === `${type}DamageMin`
-      )?.value;
-      const max = semanticToken.find(
-        (trait) => trait.trait_type === `${type}DamageMax`
-      )?.value;
+const ItemImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.5));
+  transition: filter 0.2s ease;
 
-      if (!min || !max) return null;
+  &:hover {
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.5)) brightness(1.2)
+      contrast(1.1);
+  }
+`;
 
-      return {
-        trait_type: `${type}Damage`,
-        value: `${min}-${max}`,
-      };
-    })
-    .filter((damage) => damage !== null);
-};
+const SphereButton = styled.div`
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  height: 32px;
+  width: 80px;
+  cursor: pointer;
+  border: 2px solid white;
+  border-radius: 4px;
+  transition: all 0.1s linear;
+  overflow: hidden;
 
-const isValidValue = (value) => {
-  if (value === null || value === undefined) return false;
-  if (value === "") return false;
-  if (Array.isArray(value) && value.length === 0) return false;
-  return true;
-};
+  &:hover {
+    border-width: 3px;
+  }
+`;
 
-// Add this new helper function
-const formatTraitType = (text) => {
-  // Convert camelCase to space-separated words and capitalize first letter
-  return (
-    text
-      // Add space between camelCase words
-      .replace(/([A-Z])/g, " $1")
-      // Capitalize first letter
-      .replace(/^./, (str) => str.toUpperCase())
-      // Trim any extra spaces
-      .trim()
-  );
-};
+const SphereButtonInner = styled.div`
+  width: 100%;
+  height: 100%;
+  background-image: url(${sphereButton});
+  background-size: cover;
+  background-position: center;
+  border-radius: 2px;
+`;
 
-const modTypes = [
-  { type: "implicitMods", color: "blue" },
-  { type: "uncommonMods", color: "blue" },
-  { type: "rareMods", color: "blue" },
-  { type: "aetherealMods", color: "blue" },
-  { type: "socketMods", color: "blue" },
-  { type: "nodeMods", color: "blue" },
-];
+const ModBlock = styled.div`
+  margin: 12px 0;
+  line-height: 1.4;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+`;
 
-const formatSkillTags = (tags) => {
-  if (!tags) return [];
-  return tags.split(", ").map((tag) => tag.trim());
-};
+const ModHeader = styled.div`
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 8px 0;
+  color: #666;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #666;
+    margin: 0 8px;
+  }
+`;
+
+const ModText = styled.div`
+  color: #59c4e5;
+  font-size: 14px;
+  margin: 1px 0;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+`;
+
+const Description = styled.div`
+  color: #ff8c00;
+  font-style: italic;
+  font-size: 13px;
+  text-align: center;
+  margin: 16px 0;
+  padding: 12px 0;
+  border-top: 1px solid #333;
+  line-height: 1.4;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+`;
+
+const ChainInfo = styled.div`
+  color: #666;
+  font-size: 12px;
+  text-align: center;
+  padding-top: 12px;
+  border-top: 1px solid #333;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+`;
+
+const RequirementsText = styled.div`
+  color: #b89c61;
+  font-size: 14px;
+  margin: 4px 0;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+`;
+
+const MetadataInfo = styled.div`
+  color: #666;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+  border-top: 1px solid #333;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
 
 export const ItemCard = ({ token }) => {
-  console.log(token);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  let displayedTraitsUpper = [];
-  let displayedTraitsLower = [];
-  let aetherialMods = [];
-  let implicitMods = [];
-  let rareMods = [];
-  let socketMods = [];
-  let uncommonMods = [];
-  let nodeMods = [];
-  let requirements = [];
-  let skillTags = [];
-  let affixes = {};
+  const handleBack = () => {
+    // Get the previous path and state from location
+    const previousPath = location.state?.from || "";
+    const previousState = location.state?.filterState || {};
 
-  if (token.metadata && token.metadata.properties) {
-    const semanticToken = Object.entries(token.metadata.properties)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([trait_type, value]) => ({ trait_type, value }));
-
-    const metadata = processMetadata(semanticToken);
-
-    const traits = metadata.filter(
-      (trait) =>
-        trait.trait_type !== "Damage" &&
-        ![
-          "implicitMods",
-          "uncommonMods",
-          "rareMods",
-          "aetherealMods",
-          "socketMods",
-          "nodeMods",
-          "skillTags",
-        ].includes(trait.trait_type) &&
-        trait.trait_type !== "attributeRequirements" &&
-        trait.trait_type !== "levelRequirement" &&
-        trait.trait_type !== "classRequirement"
-    );
-
-    if (traits.length > 7) {
-      displayedTraitsUpper = traits.slice(0, 7);
-      displayedTraitsLower = traits.slice(7);
+    // Now check the path and pass along the filter state
+    if (previousPath.includes("/browse")) {
+      navigate("/browse", {
+        state: {
+          activeFilter: isSkill ? "Skills" : "All",
+          ...previousState,
+        },
+      });
+    } else if (previousPath.includes("/profile")) {
+      navigate("/profile");
     } else {
-      displayedTraitsUpper = traits;
+      // Default to front page if no previous path
+      navigate("/");
     }
+  };
 
-    affixes = modTypes.reduce((acc, { type }) => {
-      if (type === "nodeMods") {
-        acc[type] =
-          token.metadata.properties[type]
-            ?.split(",")
-            .filter((mod) => mod && mod.trim() !== "") || [];
-      } else {
-        acc[type] =
-          semanticToken
-            .find((trait) => trait.trait_type === type)
-            ?.value?.split(",")
-            .filter((mod) => mod && mod.trim() !== "") || [];
-      }
-      return acc;
-    }, {});
+  const {
+    name,
+    description,
+    image,
+    properties: {
+      rarity,
+      level,
+      quality,
+      maxDurability,
+      attackSpeed,
+      range,
+      levelRequirement,
+      classRequirement,
+      itemClass,
+      itemSubClass,
+      category,
+      cooldown,
+      resourceCost,
+      skillTags,
+      armedTypeRequirements,
+      nodeMods,
+      implicitMods,
+      uncommonMods,
+      rareMods,
+      aetherealMods,
+      physicalDamageMin,
+      physicalDamageMax,
+      lightningDamageMin,
+      lightningDamageMax,
+      defense,
+      attributeRequirements,
+      socketMods,
+      fireDamageMin,
+      fireDamageMax,
+      coldDamageMin,
+      coldDamageMax,
+      aetherDamageMin,
+      aetherDamageMax,
+      aoeRadius,
+      duration,
+      projectileSpeed,
+      castSpeed,
+      destroyedNodes,
+    },
+    id,
+  } = token.metadata;
 
-    aetherialMods = affixes.aetherealMods;
-    implicitMods = affixes.implicitMods;
-    rareMods = affixes.rareMods;
-    socketMods = affixes.socketMods;
-    uncommonMods = affixes.uncommonMods;
-    nodeMods = affixes.nodeMods;
-    skillTags = formatSkillTags(token.metadata.properties.skillTags);
+  const isSkill = Boolean(cooldown !== undefined || skillTags);
+  const isJewelry =
+    ["Ring", "Amulet", "Bracelet"].includes(itemClass) ||
+    category === "Equippables";
 
-    requirements = semanticToken
-      .filter(
-        (trait) =>
-          (trait.trait_type.includes("classRequirement") ||
-            trait.trait_type.includes("levelRequirement") ||
-            trait.trait_type.includes("attributeRequirements")) &&
-          trait.value !== undefined &&
-          trait.value !== null &&
-          trait.value !== "" &&
-          trait.value !== 0
-      )
-      .map((trait) => {
-        if (trait.trait_type.includes("levelRequirement"))
-          return { ...trait, value: `Level ${trait.value}` };
-        if (trait.trait_type.includes("attributeRequirements")) {
-          const attrs = trait.value.split(",").map((attr) => {
-            const [name, value] = attr.trim().split(" ");
-            return { name, value: parseInt(value) };
-          });
+  const formatMods = (mods) => {
+    if (!mods) return [];
+    return mods
+      .split(",")
+      .map((mod) => mod.trim())
+      .filter((mod) => mod);
+  };
 
-          const validAttrs = attrs
-            .filter((attr) => attr.value > 0)
-            .map((attr) => `${attr.name} ${attr.value}`);
+  const getModType = (mod) => {
+    if (mod.includes("(Global)")) return "global";
+    if (mod.includes("(Local)")) return "local";
+    if (mod.includes("(Base)")) return "base";
+    return "local";
+  };
 
-          return { ...trait, value: validAttrs.join(", ") };
-        }
-        return trait;
-      })
-      .filter((trait) => trait.value && trait.value !== "");
-  }
+  const calculateTotalDamage = () => {
+    const physical = [physicalDamageMin || 0, physicalDamageMax || 0];
+    const lightning = [lightningDamageMin || 0, lightningDamageMax || 0];
+    const fire = [fireDamageMin || 0, fireDamageMax || 0];
+    const cold = [coldDamageMin || 0, coldDamageMax || 0];
+    const aether = [aetherDamageMin || 0, aetherDamageMax || 0];
+
+    const totalMin = physical[0] + lightning[0] + fire[0] + cold[0] + aether[0];
+    const totalMax = physical[1] + lightning[1] + fire[1] + cold[1] + aether[1];
+
+    return [totalMin, totalMax];
+  };
+
+  const [totalMin, totalMax] = calculateTotalDamage();
+
+  const getUnformalName = (subClass, itemClass) => {
+    const unformalNames = {
+      OneHand: "1h",
+      TwoHand: "2h",
+    };
+
+    const formattedSubClass = unformalNames[subClass] || subClass;
+    const formattedItemClass =
+      itemClass?.charAt(0)?.toUpperCase() + itemClass?.slice(1);
+
+    return `${formattedSubClass} ${formattedItemClass}`;
+  };
+
+  const formatAttributeRequirements = (requirements) => {
+    if (!requirements) return null;
+
+    const [toughness, trickery, caliber, brilliance] = requirements
+      .split(",")
+      .map((v) => parseInt(v.trim()));
+    const attrs = [];
+
+    if (toughness > 0) attrs.push(`Toughness ${toughness}`);
+    if (trickery > 0) attrs.push(`Trickery ${trickery}`);
+    if (caliber > 0) attrs.push(`Caliber ${caliber}`);
+    if (brilliance > 0) attrs.push(`Brilliance ${brilliance}`);
+
+    return attrs.length > 0 ? attrs.join(", ") : null;
+  };
   return (
     <StyledCard>
-      <h1 className="text-5xl break-words text-center">
-        {token.metadata.name}
-      </h1>
+      <BackButton onClick={handleBack}>←</BackButton>
+      <ItemTitle $rarity={rarity}>{name}</ItemTitle>
+      {isSkill && <SubTitle>Skill</SubTitle>}
+      {!isSkill && (
+        <SubTitle>{getUnformalName(itemSubClass, itemClass)}</SubTitle>
+      )}
+      <FormalSubTitle>Sealed Aethereal</FormalSubTitle>
 
-      <StyledImageDiv>
-        <div
-          className="absolute -left-4 -top-16 h-12 w-20 font-extrabold text-4xl cursor-pointer"
-          onClick={() => {
-            navigate(-1);
-          }}
-        >
-          ←
-        </div>
-        <div className="relative flex flex-col justify-between w-[450px]">
-          <div>
-            <img src={horisontalLine} className="w-full h-1 my-2" />
-            {requirements.length > 0 && (
-              <h3 className="mt-2">
-                <b>Requirements: </b>
-                {requirements.map((trait, i) => (
-                  <span key={i}>
-                    {trait.value}
-                    {i < requirements.length - 1 ? ", " : ""}
-                  </span>
-                ))}
-              </h3>
-            )}
-            {skillTags.length > 0 && (
-              <div className="mt-4">
-                <p className="text-gold text-xs mb-1">SKILL TAGS:</p>
-                <div className="flex flex-wrap gap-2">
-                  {skillTags.map((tag, i) => (
-                    <span
-                      key={i}
-                      className="text-blue-300 bg-blue-900/30 px-2 py-1 rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <img src={horisontalLine} alt="" className="my-2" />
-              </div>
-            )}
-            <div className="mt-6 pr-8">
-              {modTypes.map(({ type, color }) => {
-                const affixArray = affixes[type];
-                return (
-                  affixArray?.length > 0 && (
-                    <React.Fragment key={type}>
-                      <p className="text-gold text-xs -mb-1">
-                        {type.replace("Mods", " AFFIXES:").toUpperCase()}
-                      </p>
-                      {affixArray.map(
-                        (affix, i) =>
-                          affix && (
-                            <p key={i} className={`text-${color}-400 -mb-2`}>
-                              {affix}
-                            </p>
-                          )
-                      )}
-                      <img src={horisontalLine} alt="" className="my-2" />
-                    </React.Fragment>
-                  )
-                );
-              })}
-            </div>
-          </div>
-        </div>
-        <StyledImage src={token.metadata.image} />
-        <div
-          className="bg-[url('/src/img/buttons/sphere.webp')] bg-cover h-16 w-40 absolute top-[400px] right-2 cursor-pointer border-2 hover:border-4 transition-all rounded-md bg-center"
-          onClick={() =>
-            window.open(
-              `https://testnet.sphere.market/beam-testnet/nft/${ITEMS_CONTRACT}/${token.metadata.id}`
-            )
-          }
-        ></div>
-      </StyledImageDiv>
-      <img
-        src={downArrowLine}
-        className="w-4/6 h-10 my-2 transform rotate-180 mx-auto"
-      />
+      <StatAndImageContainer>
+        <StatBlock>
+          {!isSkill && (
+            <>
+              {!isJewelry && (
+                <>
+                  {quality !== undefined && (
+                    <StatLine>Quality: {quality}</StatLine>
+                  )}
+                  {maxDurability && (
+                    <StatLine>Max Durability: {maxDurability}</StatLine>
+                  )}
+                </>
+              )}
+              {defense && <StatLine>Defense: {defense}</StatLine>}
+              {totalMin > 0 && totalMax > 0 && (
+                <>
+                  <StatLine>
+                    Damage: <span className="value">{totalMin}</span>-
+                    <span className="value">{totalMax}</span>
+                  </StatLine>
+                  {physicalDamageMin > 0 && (
+                    <StatLine style={{ color: "#ae946f", marginLeft: "20px" }}>
+                      Physical:{" "}
+                      <span className="value">{physicalDamageMin}</span>-
+                      <span className="value">{physicalDamageMax}</span>
+                    </StatLine>
+                  )}
+                  {fireDamageMin > 0 && (
+                    <StatLine style={{ color: "#ae946f", marginLeft: "20px" }}>
+                      Fire: <span className="value">{fireDamageMin}</span>-
+                      <span className="value">{fireDamageMax}</span>
+                    </StatLine>
+                  )}
+                  {aetherDamageMin > 0 && (
+                    <StatLine style={{ color: "#ae946f", marginLeft: "20px" }}>
+                      Aether: <span className="value">{aetherDamageMin}</span>-
+                      <span className="value">{aetherDamageMax}</span>
+                    </StatLine>
+                  )}
+                  {lightningDamageMin > 0 && (
+                    <StatLine style={{ color: "#ae946f", marginLeft: "20px" }}>
+                      Lightning:{" "}
+                      <span className="value">{lightningDamageMin}</span>-
+                      <span className="value">{lightningDamageMax}</span>
+                    </StatLine>
+                  )}
+                  {coldDamageMin > 0 && (
+                    <StatLine style={{ color: "#ae946f", marginLeft: "20px" }}>
+                      Cold: <span className="value">{coldDamageMin}</span>-
+                      <span className="value">{coldDamageMax}</span>
+                    </StatLine>
+                  )}
+                </>
+              )}
+              {attackSpeed && (
+                <StatLine>
+                  Attack Speed: <span className="value">{attackSpeed}</span>
+                </StatLine>
+              )}
+              {range && (
+                <StatLine>
+                  Range: <span className="value">{range}</span>
+                </StatLine>
+              )}
+              <StatLine>Level: {level}</StatLine>
+              {castSpeed && (
+                <StatLine>
+                  Cast Speed: <span className="value">{castSpeed}</span>
+                </StatLine>
+              )}
+              {aoeRadius && (
+                <StatLine>
+                  AOE Radius: <span className="value">{aoeRadius}</span>
+                </StatLine>
+              )}
+              {duration && (
+                <StatLine>
+                  Duration: <span className="value">{duration}</span>
+                </StatLine>
+              )}
+              {projectileSpeed && (
+                <StatLine>
+                  Projectile Speed:{" "}
+                  <span className="value">{projectileSpeed}</span>
+                </StatLine>
+              )}
+            </>
+          )}
+          {isSkill && (
+            <>
+              <StatLine>Level: {level}</StatLine>
+              {cooldown && (
+                <StatLine>
+                  Cooldown: <span className="value">{cooldown}</span>
+                </StatLine>
+              )}
+              {resourceCost && (
+                <StatLine>
+                  Cost: Aether <span className="value">{resourceCost}</span>
+                </StatLine>
+              )}
+              {skillTags && <StatLine>Skill Tag: {skillTags}</StatLine>}
+              {armedTypeRequirements && (
+                <StatLine>Requirements: {armedTypeRequirements}</StatLine>
+              )}
+            </>
+          )}
+        </StatBlock>
 
-      {displayedTraitsUpper.map((trait, i) => {
-        return (
-          <div className="bg-[url('/src/img/ui/ListItem.png')] bg-cover">
-            <Vitals key={i}>
-              {formatTraitType(trait.trait_type)}: {trait.value}
-            </Vitals>
-          </div>
-        );
-      })}
-      <StyledMetadata>
-        {displayedTraitsLower
-          .filter(
-            (trait) =>
-              trait.value && trait.value !== "Undefined" && trait.value !== 0
-          )
-          .map((trait, i) => (
-            <TraitBox key={i}>
-              {formatTraitType(trait.trait_type)}: {trait.value}
-            </TraitBox>
+        <ImageContainer>
+          <ItemImage src={image} alt={name} />
+          <SphereButton
+            onClick={() =>
+              window.open(
+                `https://testnet.sphere.market/beam-testnet/nft/${ITEMS_CONTRACT}/${id}`
+              )
+            }
+          >
+            <SphereButtonInner />
+          </SphereButton>
+        </ImageContainer>
+      </StatAndImageContainer>
+
+      {(levelRequirement ||
+        classRequirement ||
+        formatAttributeRequirements(attributeRequirements)) && (
+        <RequirementsText>
+          Requirements:{" "}
+          {[
+            levelRequirement && `Level ${levelRequirement}`,
+            classRequirement,
+            formatAttributeRequirements(attributeRequirements),
+          ]
+            .filter(Boolean)
+            .join(", ")}
+        </RequirementsText>
+      )}
+
+      <ModBlock>
+        {/* Node Mods for Skills */}
+        {isSkill && nodeMods && formatMods(nodeMods).length > 0 && (
+          <>
+            <ModHeader>Activated Nodes</ModHeader>
+            {formatMods(nodeMods).map((mod, i) => (
+              <ModText key={`node-${i}`} $type={getModType(mod)}>
+                {mod}
+              </ModText>
+            ))}
+          </>
+        )}
+
+        {/* Implicit Mods */}
+        {implicitMods &&
+          formatMods(implicitMods).map((mod, i) => (
+            <ModText key={`implicit-${i}`} $type={getModType(mod)}>
+              {mod}
+            </ModText>
           ))}
-      </StyledMetadata>
-      <img
-        src={downArrowLine}
-        className="w-4/6 h-10 mb-2 transform rotate-180 mx-auto"
-      />
-      <p className="text-red-700 text-center absolute bottom-14 left-1/2 -translate-x-1/2">
-        All NFTs exist solely on the Testnet and have no real value
-      </p>
+
+        {/* Uncommon Mods */}
+        {uncommonMods && formatMods(uncommonMods).length > 0 && (
+          <>
+            <ModHeader>Uncommon Affixes</ModHeader>
+            {formatMods(uncommonMods).map((mod, i) => (
+              <ModText key={`uncommon-${i}`} $type={getModType(mod)}>
+                {mod}
+              </ModText>
+            ))}
+          </>
+        )}
+
+        {/* Rare Mods */}
+        {rareMods && formatMods(rareMods).length > 0 && (
+          <>
+            <ModHeader>Rare Affixes</ModHeader>
+            {formatMods(rareMods).map((mod, i) => (
+              <ModText key={`rare-${i}`} $type={getModType(mod)}>
+                {mod}
+              </ModText>
+            ))}
+          </>
+        )}
+
+        {/* Aethereal Mods */}
+        {aetherealMods && formatMods(aetherealMods).length > 0 && (
+          <>
+            <ModHeader>Aethereal</ModHeader>
+            {formatMods(aetherealMods).map((mod, i) => (
+              <ModText key={`aethereal-${i}`} $type={getModType(mod)}>
+                {mod}
+              </ModText>
+            ))}
+          </>
+        )}
+
+        {/* Socket Mods */}
+        {socketMods && formatMods(socketMods).length > 0 && (
+          <>
+            <ModHeader>Socket Modifiers</ModHeader>
+            {formatMods(socketMods).map((mod, i) => (
+              <ModText key={`socket-${i}`} $type={getModType(mod)}>
+                {mod}
+              </ModText>
+            ))}
+          </>
+        )}
+
+        {/* Destroyed Nodes for skills */}
+        {isSkill && destroyedNodes > 0 && (
+          <>
+            <ModHeader>Destroyed Nodes</ModHeader>
+            <ModText>{destroyedNodes}</ModText>
+          </>
+        )}
+      </ModBlock>
+      {description && rarity && rarity == "Unique" && (
+        <Description>{description}</Description>
+      )}
+      <ChainInfo>On-chain Id: {id}</ChainInfo>
     </StyledCard>
   );
 };

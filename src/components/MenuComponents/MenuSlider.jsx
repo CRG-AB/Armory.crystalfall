@@ -24,6 +24,7 @@ export const MenuSlider = ({
   setValue,
   max,
   min,
+  step,
   defaultOpen,
 }) => {
   const handleChange = (e, newValue) => {
@@ -37,6 +38,7 @@ export const MenuSlider = ({
           className="w-3/4"
           min={min}
           max={max}
+          step={step || 1}
           value={value}
           onChange={handleChange}
           valueLabelDisplay="on"

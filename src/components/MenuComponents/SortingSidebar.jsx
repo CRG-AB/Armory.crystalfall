@@ -4,7 +4,7 @@ import { Sidebar, Menu } from "react-pro-sidebar";
 import { MenuCheckbox } from "./MenuCheckbox.jsx";
 import { MenuSlider } from "./MenuSlider.jsx";
 import { ItemCategoryClassFilter } from "./ItemCategoryClassFilter.jsx";
-import { SortByMods } from "./SortByMods.jsx";
+import { SortByMods, filterNFTsByMods } from "./SortByMods.jsx";
 import { Expandable } from "../buttons/Expandable.jsx";
 import { Input } from "../ui/Input.jsx";
 import { SubMenu } from "react-pro-sidebar";
@@ -18,6 +18,27 @@ import { SubMenu } from "react-pro-sidebar";
   /> 
   */
 }
+
+// Helper function to check if an NFT has a specific mod
+const nftHasMod = (nft, mod) => {
+  const { implicitMods, aetherealMods, uncommonMods, rareMods } =
+    nft.metadata.properties;
+
+  // Combine all mods into a single string and convert to lowercase for case-insensitive comparison
+  const allModsString = `${implicitMods || ""} ${aetherealMods || ""} ${
+    uncommonMods || ""
+  } ${rareMods || ""}`.toLowerCase();
+
+  // Remove the value and (Global) suffix from mods for comparison
+  // e.g., "10% Damage Increased(Global)" -> "damage increased"
+  const normalizedMod = mod
+    .toLowerCase()
+    .replace(/\d+%?\s?/, "") // Remove numbers and % sign
+    .replace(/\(global\)/i, "") // Remove (Global)
+    .trim();
+
+  return allModsString.includes(normalizedMod);
+};
 
 export const SortingSidebar = ({
   isSidebarOpen,
@@ -34,8 +55,8 @@ export const SortingSidebar = ({
     useState([0, 100]); // THIS
   const [damageFilterValue, setDamageFilterValue] = useState([0, 100]); /// DISCUSS THIS
   const [qualityFilterValue, setQualityFilterValue] = useState([1, 5]);
-  const [rangeFilterValue, setRangeFilterValue] = useState([0, 30]); ///// THIS
-  const [attackSpeedFilterValue, setAttackSpeedFilterValue] = useState([0, 10]); ///// THIS
+  const [rangeFilterValue, setRangeFilterValue] = useState([0, 10]); // Updated max to 10
+  const [attackSpeedFilterValue, setAttackSpeedFilterValue] = useState([0, 3]); ///// THIS
   const [levelFilterValue, setLevelFilterValue] = useState([0, 100]); ///// THIS
   const [checkedDamageType, setCheckedDamageType] = useState({
     Fire: false,
@@ -45,7 +66,7 @@ export const SortingSidebar = ({
     Aetherial: false,
   });
   const [checkedRarity, setCheckedRarity] = useState({
-    Legendary: false,
+    Unique: false,
     Rare: false,
   });
   const [modsFilterArray, setModsFilterArray] = useState([]);
@@ -81,7 +102,11 @@ export const SortingSidebar = ({
       // Track removed NFTs and their reasons
       const removedNFTs = [];
 
-      const filtered = nfts.filter((nft) => {
+      // First apply mods filter
+      let filtered = filterNFTsByMods(nfts, modsFilterArray);
+
+      // Then apply other filters
+      filtered = filtered.filter((nft) => {
         const metadata = nft.metadata;
 
         // Check for valid metadata
@@ -330,7 +355,19 @@ export const SortingSidebar = ({
           return false;
         }
 
-        // Range filter
+        // Range filter - updated to match Attack Speed filter logic
+        if (
+          rangeFilterValue[0] > 0 &&
+          (!metadata.properties.range ||
+            metadata.properties.range === undefined)
+        ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `No range value when filter is active`,
+          });
+          return false;
+        }
+
         if (
           metadata.properties.range &&
           (rangeFilterValue[0] > metadata.properties.range ||
@@ -346,6 +383,18 @@ export const SortingSidebar = ({
         }
 
         // Attack Speed filter
+        if (
+          attackSpeedFilterValue[0] > 0 &&
+          (!metadata.properties.attackSpeed ||
+            metadata.properties.attackSpeed === undefined)
+        ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `No attack speed value when filter is active`,
+          });
+          return false;
+        }
+
         if (
           metadata.properties.attackSpeed &&
           (attackSpeedFilterValue[0] > metadata.properties.attackSpeed ||
@@ -380,17 +429,48 @@ export const SortingSidebar = ({
           .filter(([_, checked]) => checked)
           .map(([type]) => type);
 
-        if (
-          checkedDamageTypes.length > 0 &&
-          !checkedDamageTypes.includes(metadata.properties.damageType)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `Damage type ${
-              metadata.properties.damageType
-            } not in [${checkedDamageTypes.join(", ")}]`,
+        if (checkedDamageTypes.length > 0) {
+          const hasDamageTypes = checkedDamageTypes.every((type) => {
+            switch (type.toLowerCase()) {
+              case "physical":
+                return (
+                  metadata.properties.physicalDamageMin > 0 ||
+                  metadata.properties.physicalDamageMax > 0
+                );
+              case "lightning":
+                return (
+                  metadata.properties.lightningDamageMin > 0 ||
+                  metadata.properties.lightningDamageMax > 0
+                );
+              case "fire":
+                return (
+                  metadata.properties.fireDamageMin > 0 ||
+                  metadata.properties.fireDamageMax > 0
+                );
+              case "cold":
+                return (
+                  metadata.properties.coldDamageMin > 0 ||
+                  metadata.properties.coldDamageMax > 0
+                );
+              case "aether":
+                return (
+                  metadata.properties.aetherDamageMin > 0 ||
+                  metadata.properties.aetherDamageMax > 0
+                );
+              default:
+                return false;
+            }
           });
-          return false;
+
+          if (!hasDamageTypes) {
+            removedNFTs.push({
+              name: metadata.name + ": " + metadata.id,
+              reason: `Missing required damage types: ${checkedDamageTypes.join(
+                ", "
+              )}`,
+            });
+            return false;
+          }
         }
 
         // Rarity filter
@@ -407,6 +487,35 @@ export const SortingSidebar = ({
             reason: `Rarity ${
               metadata.properties.rarity
             } not in [${checkedRarities.join(", ")}]`,
+          });
+          return false;
+        }
+
+        // Level Requirement filter
+        if (
+          levelRequirementFilterValue[0] > 0 &&
+          (!metadata.properties.levelRequirement ||
+            metadata.properties.levelRequirement === undefined)
+        ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `No level requirement value when filter is active`,
+          });
+          return false;
+        }
+
+        if (
+          metadata.properties.levelRequirement &&
+          (levelRequirementFilterValue[0] >
+            metadata.properties.levelRequirement ||
+            levelRequirementFilterValue[1] <
+              metadata.properties.levelRequirement)
+        ) {
+          removedNFTs.push({
+            name: metadata.name + ": " + metadata.id,
+            reason: `Level requirement ${
+              metadata.properties.levelRequirement
+            } outside range [${levelRequirementFilterValue.join("-")}]`,
           });
           return false;
         }
@@ -520,7 +629,7 @@ export const SortingSidebar = ({
           />
           <MenuCheckbox
             name="Rarity"
-            items={["Legendary", "Rare"]}
+            items={["Unique", "Rare"]}
             checked={checkedRarity}
             setChecked={setCheckedRarity}
             isSidebarOpen={isSidebarOpen}
@@ -553,10 +662,12 @@ export const SortingSidebar = ({
             setValue={setRangeFilterValue}
             min={0}
             max={10}
+            step={0.1}
+            defaultOpen={false}
           />
           <MenuCheckbox
             name="Damage Type"
-            items={["Fire", "Cold", "Lightning", "Physical", "Aetherial"]}
+            items={["Fire", "Cold", "Lightning", "Physical", "Aether"]}
             checked={checkedDamageType}
             setChecked={setCheckedDamageType}
             isSidebarOpen={isSidebarOpen}
@@ -566,7 +677,9 @@ export const SortingSidebar = ({
             value={attackSpeedFilterValue}
             setValue={setAttackSpeedFilterValue}
             min={0}
-            max={10}
+            max={3}
+            step={0.1}
+            defaultOpen={false}
           />
 
           <MenuSlider

@@ -1,147 +1,101 @@
 import React, { useState } from "react";
 import { SubMenu } from "react-pro-sidebar";
 import mods from "./mods.json";
-import { Plus } from "lucide-react";
-import { ModButton } from "../buttons/ModButton";
-import { InputNode } from "../ui/InputNode";
-
-import boxBakgroundSelectedSmall from "../../img/ui/box-background-selected-small.webp";
+import { Plus, X } from "lucide-react";
 import boxBakgroundSelected from "../../img/ui/box-background-selected.webp";
+
+// Helper function to check if an NFT has a specific mod
+const nftHasMod = (nft, mod) => {
+  const { implicitMods, aetherealMods, uncommonMods, rareMods } =
+    nft.metadata.properties;
+
+  // Combine all mods into a single string and convert to lowercase for case-insensitive comparison
+  const allModsString =
+    `${implicitMods} ${aetherealMods} ${uncommonMods} ${rareMods}`.toLowerCase();
+
+  // Remove the value and (Global) suffix from mods for comparison
+  // e.g., "10% Damage Increased(Global)" -> "damage increased"
+  const normalizedMod = mod
+    .toLowerCase()
+    .replace(/\d+%?\s?/, "") // Remove numbers and % sign
+    .replace(/\(global\)/i, "") // Remove (Global)
+    .trim();
+
+  return allModsString.includes(normalizedMod);
+};
+
+// Function to filter NFTs based on selected mods
+export const filterNFTsByMods = (nfts, selectedMods) => {
+  if (!selectedMods.length) return nfts;
+
+  return nfts.filter((nft) => selectedMods.every((mod) => nftHasMod(nft, mod)));
+};
 
 export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
   const [selectedValue, setSelectedValue] = useState("");
-  const [inputValue1, setInputValue1] = useState("");
-  const [inputValue2, setInputValue2] = useState("");
-  const [error, setError] = useState(false);
-  const [error2, setError2] = useState(false);
 
   const handleSelectChange = (event) => {
     setSelectedValue(event.target.value);
   };
 
-  const handleInput1Change = (event) => {
-    if (event.target.value >= 300 || event.target.value < 0) {
-      setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 1000);
-      return;
-    }
-    setInputValue1(event.target.value);
-  };
-
-  const handleInput2Change = (event) => {
-    if (event.target.value >= 300 || event.target.value < 0) {
-      setError2(true);
-      setTimeout(() => {
-        setError2(false);
-      }, 1000);
-      return;
-    }
-    setInputValue2(event.target.value);
-  };
   const isModAlreadyAdded = (mod) => {
-    return modsFilterArray.some((item) => item.mod === mod);
+    return modsFilterArray.some((item) => item === mod);
   };
 
   const handleAddMod = (event) => {
     event.preventDefault();
-    if (
-      selectedValue &&
-      !isModAlreadyAdded(selectedValue) &&
-      ((inputValue1 == 0 && inputValue2 == 0) ||
-        inputValue1 <= inputValue2 ||
-        inputValue2 == 0)
-    ) {
-      const newMod = {
-        mod: selectedValue,
-        min: inputValue1,
-        max: inputValue2,
-      };
-      setModList([...modsFilterArray, newMod]);
+    if (selectedValue && !isModAlreadyAdded(selectedValue)) {
+      setModList([...modsFilterArray, selectedValue]);
       setSelectedValue("");
-      setInputValue1("");
-      setInputValue2("");
-    } else {
-      console.log(inputValue1);
-      setError(true);
-      setError2(true);
-      setTimeout(() => {
-        setError(false);
-        setError2(false);
-      }, 2000);
     }
   };
 
   const handleRemoveMod = (mod) => {
-    const updatedModList = modsFilterArray.filter((item) => item.mod !== mod);
+    const updatedModList = modsFilterArray.filter((item) => item !== mod);
     setModList(updatedModList);
   };
 
   return (
     <SubMenu label="Mods" defaultOpen={defaultOpen}>
-      {modsFilterArray.length > 0 ? (
-        <div
-          className="grid grid-cols-5 p-1 h-[41px] text-sm mb-1 justify-center items-center"
-          style={{
-            background: `url(${boxBakgroundSelectedSmall})`,
-            filter: "saturate(0.4)",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "contain",
-            borderCollapse: "collapse",
-          }}
-        >
-          <div className="col-span-3 pl-1">Name:</div>
-          <div className="">Min</div>
-          <div className="">Max</div>
-        </div>
-      ) : null}
       {modsFilterArray.map((mod) => (
-        <ModButton key={mod.mod} mod={mod} handleRemoveMod={handleRemoveMod} />
+        <div
+          key={mod}
+          className="flex justify-between items-center p-2 text-sm hover:bg-gray-700/30"
+        >
+          <span className="truncate pr-2 pl-1">{mod}</span>
+          <button
+            onClick={() => handleRemoveMod(mod)}
+            className="hover:text-red-500 flex-shrink-0"
+          >
+            <X size={16} />
+          </button>
+        </div>
       ))}
       <div
-        className="overflow-hidden text-sm items-center h-[58px] flex justify-center gap-1 p-1"
+        className="flex items-center h-[58px] w-[290px] gap-1 p-1 mx-2"
         style={{
           background: `url(${boxBakgroundSelected})`,
           filter: "saturate(0.4)",
           backgroundRepeat: "no-repeat",
-          backgroundSize: "contain",
+          backgroundSize: "cover",
+          backgroundPosition: "right",
           borderCollapse: "collapse",
         }}
       >
         <select
-          className="pl-1 bg-transparent overflow-auto w-44 cursor-pointer outline-none"
+          className="pl-1 bg-transparent w-[250px] cursor-pointer outline-none text-sm"
           value={selectedValue}
           onChange={handleSelectChange}
         >
+          <option value="">Select a mod type...</option>
           {mods.modifiers.map((option) => (
-            <option key={option}>{option}</option>
+            <option key={option} value={option}>
+              {option}
+            </option>
           ))}
         </select>
-        <InputNode
-          placeholder="Min"
-          h={10}
-          w={10}
-          min={0}
-          max={300}
-          type="number"
-          value={inputValue1}
-          onChange={handleInput1Change}
-          error={error}
-        />
-        <InputNode
-          placeholder="Max"
-          h={10}
-          w={10}
-          min={0}
-          max={300}
-          type="number"
-          value={inputValue2}
-          onChange={handleInput2Change}
-          error={error2}
-        />
-        <button onClick={handleAddMod}>
-          <Plus />
+        <button onClick={handleAddMod} className="flex-shrink-0">
+          <Plus size={20} />
         </button>
       </div>
     </SubMenu>

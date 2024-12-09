@@ -2,6 +2,7 @@ import { styled } from "styled-components";
 import { useState, useEffect } from "react";
 import { fetchTokenIds, fetchNFTs } from "../services/fetchTokenIds.js";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 import { NFTGrid } from "../components/NFTGrid";
 import { SortingSidebar } from "../components/MenuComponents/SortingSidebar.jsx";
@@ -58,6 +59,16 @@ export const BrowsePage = () => {
 
   const [Skills, setSkills] = useState(false);
 
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check if we have a filter state from navigation
+    const filterFromNav = location.state?.activeFilter;
+    if (filterFromNav) {
+      setSkills(filterFromNav === "Skills");
+    }
+  }, [location]);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -78,29 +89,32 @@ export const BrowsePage = () => {
   }, []);
 
   useEffect(() => {
-    if (Skills) {
-      setFilteredNFTs(
-        allNFTs.filter((nft) => {
-          if (!nft?.metadata?.properties) {
-            return false;
-          }
-          // If it has skillTags property, it's a skill
-          return !!nft.metadata.properties.skillTags;
-        })
-      );
-    } else {
-      // Show only items (non-skills)
-      setFilteredNFTs(
-        allNFTs.filter((nft) => {
-          if (!nft?.metadata?.properties) {
-            return false;
-          }
-          // Show items that don't have skillTags
-          return !nft.metadata.properties.skillTags;
-        })
-      );
+    // Only filter if we have loaded NFTs and are not in loading state
+    if (!isLoading && allNFTs.length > 0) {
+      if (Skills) {
+        setFilteredNFTs(
+          allNFTs.filter((nft) => {
+            if (!nft?.metadata?.properties) {
+              return false;
+            }
+            // If it has skillTags property, it's a skill
+            return !!nft.metadata.properties.skillTags;
+          })
+        );
+      } else {
+        // Show only items (non-skills)
+        setFilteredNFTs(
+          allNFTs.filter((nft) => {
+            if (!nft?.metadata?.properties) {
+              return false;
+            }
+            // Show items that don't have skillTags
+            return !nft.metadata.properties.skillTags;
+          })
+        );
+      }
     }
-  }, [Skills, allNFTs]);
+  }, [Skills, allNFTs, isLoading]);
 
   useEffect(() => {
     window.scrollTo({ top: 100, behavior: "smooth" });

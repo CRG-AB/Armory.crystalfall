@@ -70,7 +70,15 @@ const StyledIPFS = styled.img`
   transition: 0.5s ease;
 `;
 
-export const DisplayToken = ({ name, linkTo, img, className }) => {
+export const DisplayToken = ({
+  name,
+  linkTo,
+  img,
+  className,
+  onMouseEnter,
+  onMouseLeave,
+  onMouseMove,
+}) => {
   const ref = useRef();
   const containerRef = useRef();
   useEffect(() => {
@@ -82,10 +90,17 @@ export const DisplayToken = ({ name, linkTo, img, className }) => {
   }, [name]);
 
   return (
-    <StyledDiv className={`${className}`} ref={ref}>
+    <StyledDiv
+      className={`${className}`}
+      ref={ref}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onMouseMove={onMouseMove}
+    >
       <NavLink
         className="flex justify-center items-center flex-col"
         to={`/${linkTo}`}
+        state={{ from: `/${window.location.hash}` }}
         onClick={() => {
           window.scrollTo({ top: 100, behavior: "smooth" });
         }}

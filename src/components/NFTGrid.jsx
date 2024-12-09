@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { styled } from "styled-components";
 import { DisplayToken } from "./ui/DisplayToken";
 import { thirdWebIPFSLink } from "../services/IPFSLink";
 import { Spinner } from "./ui/Spinner";
 import { ArrowButton } from "./buttons/ArrowButton";
+import { ItemCard } from "./ItemCard";
 
 const StyledTokenList = styled(motion.ul)`
   display: grid;
@@ -25,6 +26,14 @@ const StyledTokenList = styled(motion.ul)`
   }
 `;
 
+const HoverPreview = styled(motion.div)`
+  position: fixed;
+  z-index: 1000;
+  transform: scale(0.6);
+  transform-origin: top left;
+  pointer-events: none;
+`;
+
 export const NFTGrid = ({
   nfts = [],
   isLoading,
@@ -34,6 +43,37 @@ export const NFTGrid = ({
   totalPages,
   nftsPerPage,
 }) => {
+  const [hoveredToken, setHoveredToken] = useState(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [hoverTimer, setHoverTimer] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimer) clearTimeout(hoverTimer);
+    };
+  }, [hoverTimer]);
+
+  const handleMouseEnter = (e, token) => {
+    setHoveredToken(token);
+    setMousePos({ x: e.clientX, y: e.clientY });
+    const timer = setTimeout(() => {
+      setShowPreview(true);
+    }, 600);
+    setHoverTimer(timer);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimer) clearTimeout(hoverTimer);
+    setHoverTimer(null);
+    setHoveredToken(null);
+    setShowPreview(false);
+  };
+
+  const handleMouseMove = (e) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  };
+
   const hasPreviousPage = count > 0;
   const hasNextPage = (count + 1) * nftsPerPage < nfts.length;
 
@@ -90,11 +130,31 @@ export const NFTGrid = ({
                   linkTo={`token/${token.metadata.id}`}
                   img={imageUrl ? thirdWebIPFSLink(imageUrl) : ""}
                   tokenID={token.metadata.id}
+                  onMouseEnter={(e) => handleMouseEnter(e, token)}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseMove={handleMouseMove}
                 />
               </motion.li>
             );
           })}
         </StyledTokenList>
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {hoveredToken && showPreview && (
+          <HoverPreview
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 0.6 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              left: mousePos.x + 5,
+              top: mousePos.y + 8,
+            }}
+          >
+            <ItemCard token={hoveredToken} />
+          </HoverPreview>
+        )}
       </AnimatePresence>
 
       {nfts.length > nftsPerPage && (
