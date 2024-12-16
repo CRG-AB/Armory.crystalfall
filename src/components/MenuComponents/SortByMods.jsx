@@ -62,7 +62,12 @@ export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
           key={mod}
           className="flex justify-between items-center p-2 text-sm hover:bg-gray-700/30"
         >
-          <span className="truncate pr-2 pl-1">{mod}</span>
+          <span
+            className="truncate pr-2 pl-1 w-[250px]"
+            title={mod.length > 35 ? mod : ""}
+          >
+            {mod}
+          </span>
           <button
             onClick={() => handleRemoveMod(mod)}
             className="hover:text-red-500 flex-shrink-0"

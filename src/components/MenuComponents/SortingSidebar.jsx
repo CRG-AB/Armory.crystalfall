@@ -8,6 +8,7 @@ import { SortByMods, filterNFTsByMods } from "./SortByMods.jsx";
 import { Expandable } from "../buttons/Expandable.jsx";
 import { Input } from "../ui/Input.jsx";
 import { SubMenu } from "react-pro-sidebar";
+import { useNFTContext } from "../../context/NFTContext";
 
 {
   /* 
@@ -18,544 +19,9 @@ import { SubMenu } from "react-pro-sidebar";
   /> 
   */
 }
-
-// Helper function to check if an NFT has a specific mod
-const nftHasMod = (nft, mod) => {
-  const { implicitMods, aetherealMods, uncommonMods, rareMods } =
-    nft.metadata.properties;
-
-  // Combine all mods into a single string and convert to lowercase for case-insensitive comparison
-  const allModsString = `${implicitMods || ""} ${aetherealMods || ""} ${
-    uncommonMods || ""
-  } ${rareMods || ""}`.toLowerCase();
-
-  // Remove the value and (Global) suffix from mods for comparison
-  // e.g., "10% Damage Increased(Global)" -> "damage increased"
-  const normalizedMod = mod
-    .toLowerCase()
-    .replace(/\d+%?\s?/, "") // Remove numbers and % sign
-    .replace(/\(global\)/i, "") // Remove (Global)
-    .trim();
-
-  return allModsString.includes(normalizedMod);
-};
-
-export const SortingSidebar = ({
-  isSidebarOpen,
-  nfts,
-  setFilteredNFTs,
-  setIsSidebarOpen,
-}) => {
-  // Filter values
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategoryClassFilters, setActiveCategoryClassFilters] = useState(
-    []
-  );
-  const [levelRequirementFilterValue, setLevelRequirementFilterValue] =
-    useState([0, 100]); // THIS
-  const [damageFilterValue, setDamageFilterValue] = useState([0, 100]); /// DISCUSS THIS
-  const [qualityFilterValue, setQualityFilterValue] = useState([1, 5]);
-  const [rangeFilterValue, setRangeFilterValue] = useState([0, 10]); // Updated max to 10
-  const [attackSpeedFilterValue, setAttackSpeedFilterValue] = useState([0, 3]); ///// THIS
-  const [levelFilterValue, setLevelFilterValue] = useState([0, 100]); ///// THIS
-  const [checkedDamageType, setCheckedDamageType] = useState({
-    Fire: false,
-    Cold: false,
-    Lightning: false,
-    Physical: false,
-    Aetherial: false,
-  });
-  const [checkedRarity, setCheckedRarity] = useState({
-    Unique: false,
-    Rare: false,
-  });
-  const [modsFilterArray, setModsFilterArray] = useState([]);
-
-  // Update searchTerm 1 second after inputValue changes
-  const [searchTermInputValue, setSearchTermInputValue] = useState("");
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setSearchTerm(searchTermInputValue);
-    }, 1000);
-
-    // Clear the timeout when inputValue changes or when the component unmounts
-    return () => clearTimeout(timeoutId);
-  }, [searchTermInputValue]);
-
-  /////////////////// Only one season for now ///////////////////
-  // const [checkedItemSeason, setCheckedItemSeason] = useState({
-  //   "Open Beta": false,
-  // });
-  /////////////////// Only one season for now ///////////////////
-
-  /////////////////// STEP 2 ///////////////////
-  // Filter NFTs
-  /////////////////// STEP 2 ///////////////////
-
-  useEffect(() => {
-    const filterNFTs = (nfts) => {
-      if (!nfts) {
-        console.log("[Filter] No NFTs available");
-        return [];
-      }
-
-      // Track removed NFTs and their reasons
-      const removedNFTs = [];
-
-      // First apply mods filter
-      let filtered = filterNFTsByMods(nfts, modsFilterArray);
-
-      // Then apply other filters
-      filtered = filtered.filter((nft) => {
-        const metadata = nft.metadata;
-
-        // Check for valid metadata
-        if (!metadata || !metadata.properties) {
-          removedNFTs.push({
-            name: metadata?.name || "Unknown" + ": " + metadata.id,
-            reason: "Missing metadata or properties",
-          });
-          return false;
-        }
-
-        if (metadata.properties.rarity === "Unique") {
-          return false;
-        }
-
-        // Search term filter
-        if (
-          searchTerm &&
-          !metadata.name.toLowerCase().includes(searchTerm.toLowerCase())
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `Search term "${searchTerm}" not found`,
-          });
-          return false;
-        }
-
-        // Filter by Category and Class
-        let activeCategoryFilters = [];
-        let activeSubCategoryFilters = [];
-        let activeClassFilters = [];
-
-        // Filter "category"
-        if (activeCategoryClassFilters?.category) {
-          activeCategoryFilters = Object.keys(
-            activeCategoryClassFilters.category
-          ).filter((key) => activeCategoryClassFilters.category[key] === true);
-
-          // If categories are selected, item must match at least one selected category
-          if (
-            activeCategoryFilters.length > 0 &&
-            !activeCategoryFilters.includes(metadata.properties.category)
-          ) {
-            return false;
-          }
-        }
-
-        // For each category, apply its specific filters
-        if (metadata.properties.category === "Weapon") {
-          // Filter "subCategory" - Only apply for Weapon category
-          if (activeCategoryClassFilters?.subCategory) {
-            activeSubCategoryFilters = Object.keys(
-              activeCategoryClassFilters.subCategory
-            ).filter(
-              (key) => activeCategoryClassFilters.subCategory[key] === true
-            );
-
-            if (
-              activeSubCategoryFilters.length > 0 &&
-              !activeSubCategoryFilters.includes(
-                metadata.properties.subCategory
-              )
-            ) {
-              return false;
-            }
-          }
-
-          // Filter weapon classes
-          if (activeCategoryClassFilters?.itemClass) {
-            const weaponClasses = [
-              "Axe",
-              "Mace",
-              "Sword",
-              "Dagger",
-              "Pistol",
-              "Rifle",
-              "Shotgun",
-            ];
-            const activeWeaponClasses = Object.keys(
-              activeCategoryClassFilters.itemClass
-            ).filter(
-              (key) =>
-                weaponClasses.includes(key) &&
-                activeCategoryClassFilters.itemClass[key] === true
-            );
-
-            if (
-              activeWeaponClasses.length > 0 &&
-              !activeWeaponClasses.includes(metadata.properties.itemClass)
-            ) {
-              return false;
-            }
-          }
-
-          // Filter weapon subclasses
-          if (activeCategoryClassFilters?.subClass) {
-            const activeSubClassFilters = Object.keys(
-              activeCategoryClassFilters.subClass
-            ).filter(
-              (key) => activeCategoryClassFilters.subClass[key] === true
-            );
-
-            if (activeSubClassFilters.length > 0) {
-              const itemClass = metadata.properties.itemClass;
-              const itemSubClass = metadata.properties.itemSubClass;
-              let matchesSubClass = false;
-
-              if (itemClass === "Sword") {
-                if (
-                  (activeSubClassFilters.includes("sword1h") &&
-                    itemSubClass === "OneHand") ||
-                  (activeSubClassFilters.includes("sword2h") &&
-                    itemSubClass === "TwoHand")
-                ) {
-                  matchesSubClass = true;
-                }
-              } else if (itemClass === "Axe") {
-                if (
-                  (activeSubClassFilters.includes("axe1h") &&
-                    itemSubClass === "OneHand") ||
-                  (activeSubClassFilters.includes("axe2h") &&
-                    itemSubClass === "TwoHand")
-                ) {
-                  matchesSubClass = true;
-                }
-              } else if (itemClass === "Mace") {
-                if (
-                  (activeSubClassFilters.includes("mace1h") &&
-                    itemSubClass === "OneHand") ||
-                  (activeSubClassFilters.includes("mace2h") &&
-                    itemSubClass === "TwoHand")
-                ) {
-                  matchesSubClass = true;
-                }
-              }
-
-              if (!matchesSubClass) {
-                return false;
-              }
-            }
-          }
-        } else if (metadata.properties.category === "Armor") {
-          // Filter armor classes
-          if (activeCategoryClassFilters?.itemClass) {
-            const armorClasses = [
-              "BodyArmour",
-              "Boots",
-              "Gloves",
-              "Helmet",
-              "Cape",
-            ];
-            const activeArmorClasses = Object.keys(
-              activeCategoryClassFilters.itemClass
-            ).filter(
-              (key) =>
-                armorClasses.includes(key) &&
-                activeCategoryClassFilters.itemClass[key] === true
-            );
-
-            if (
-              activeArmorClasses.length > 0 &&
-              !activeArmorClasses.includes(metadata.properties.itemClass)
-            ) {
-              return false;
-            }
-          }
-        } else if (metadata.properties.category === "OffHand") {
-          // Filter offhand classes
-          if (activeCategoryClassFilters?.itemClass) {
-            const offHandClasses = ["Shield", "Codex"];
-            const activeOffHandClasses = Object.keys(
-              activeCategoryClassFilters.itemClass
-            ).filter(
-              (key) =>
-                offHandClasses.includes(key) &&
-                activeCategoryClassFilters.itemClass[key] === true
-            );
-
-            if (
-              activeOffHandClasses.length > 0 &&
-              !activeOffHandClasses.includes(metadata.properties.itemClass)
-            ) {
-              return false;
-            }
-          }
-        } else if (metadata.properties.category === "Jewelry") {
-          // Filter jewelry classes
-          if (activeCategoryClassFilters?.itemClass) {
-            const jewelryClasses = ["Ring", "Amulet", "Bracelet"];
-            const activeJewelryClasses = Object.keys(
-              activeCategoryClassFilters.itemClass
-            ).filter(
-              (key) =>
-                jewelryClasses.includes(key) &&
-                activeCategoryClassFilters.itemClass[key] === true
-            );
-
-            if (
-              activeJewelryClasses.length > 0 &&
-              !activeJewelryClasses.includes(metadata.properties.itemClass)
-            ) {
-              return false;
-            }
-          }
-        }
-
-        // Damage filter
-        if (damageFilterValue) {
-          // Calculate total max damage from all damage types
-          const totalMaxDamage = [
-            metadata.properties.physicalDamageMax || 0,
-            metadata.properties.fireDamageMax || 0,
-            metadata.properties.coldDamageMax || 0,
-            metadata.properties.lightningDamageMax || 0,
-            metadata.properties.aetherDamageMax || 0,
-            // Include the generic damageMax as well
-            metadata.properties.damageMax || 0,
-          ].reduce((sum, damage) => sum + damage, 0);
-
-          if (
-            damageFilterValue[0] > totalMaxDamage ||
-            damageFilterValue[1] < totalMaxDamage
-          ) {
-            removedNFTs.push({
-              name: metadata.name + ": " + metadata.id,
-              reason: `Total damage ${totalMaxDamage} outside range [${damageFilterValue.join(
-                "-"
-              )}]`,
-            });
-            return false;
-          }
-        }
-
-        // Quality filter
-        if (
-          metadata.properties.quality &&
-          (qualityFilterValue[0] > metadata.properties.quality ||
-            qualityFilterValue[1] < metadata.properties.quality)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `Quality ${
-              metadata.properties.quality
-            } outside range [${qualityFilterValue.join("-")}]`,
-          });
-          return false;
-        }
-
-        // Range filter - updated to match Attack Speed filter logic
-        if (
-          rangeFilterValue[0] > 0 &&
-          (!metadata.properties.range ||
-            metadata.properties.range === undefined)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `No range value when filter is active`,
-          });
-          return false;
-        }
-
-        if (
-          metadata.properties.range &&
-          (rangeFilterValue[0] > metadata.properties.range ||
-            rangeFilterValue[1] < metadata.properties.range)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `Range ${
-              metadata.properties.range
-            } outside range [${rangeFilterValue.join("-")}]`,
-          });
-          return false;
-        }
-
-        // Attack Speed filter
-        if (
-          attackSpeedFilterValue[0] > 0 &&
-          (!metadata.properties.attackSpeed ||
-            metadata.properties.attackSpeed === undefined)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `No attack speed value when filter is active`,
-          });
-          return false;
-        }
-
-        if (
-          metadata.properties.attackSpeed &&
-          (attackSpeedFilterValue[0] > metadata.properties.attackSpeed ||
-            attackSpeedFilterValue[1] < metadata.properties.attackSpeed)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `Attack Speed ${
-              metadata.properties.attackSpeed
-            } outside range [${attackSpeedFilterValue.join("-")}]`,
-          });
-          return false;
-        }
-
-        // Level filter
-        if (
-          metadata.properties.level &&
-          (levelFilterValue[0] > metadata.properties.level ||
-            levelFilterValue[1] < metadata.properties.level)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `Level ${
-              metadata.properties.level
-            } outside range [${levelFilterValue.join("-")}]`,
-          });
-          return false;
-        }
-
-        // Damage Type filter
-        const checkedDamageTypes = Object.entries(checkedDamageType)
-          .filter(([_, checked]) => checked)
-          .map(([type]) => type);
-
-        if (checkedDamageTypes.length > 0) {
-          const hasDamageTypes = checkedDamageTypes.every((type) => {
-            switch (type.toLowerCase()) {
-              case "physical":
-                return (
-                  metadata.properties.physicalDamageMin > 0 ||
-                  metadata.properties.physicalDamageMax > 0
-                );
-              case "lightning":
-                return (
-                  metadata.properties.lightningDamageMin > 0 ||
-                  metadata.properties.lightningDamageMax > 0
-                );
-              case "fire":
-                return (
-                  metadata.properties.fireDamageMin > 0 ||
-                  metadata.properties.fireDamageMax > 0
-                );
-              case "cold":
-                return (
-                  metadata.properties.coldDamageMin > 0 ||
-                  metadata.properties.coldDamageMax > 0
-                );
-              case "aether":
-                return (
-                  metadata.properties.aetherDamageMin > 0 ||
-                  metadata.properties.aetherDamageMax > 0
-                );
-              default:
-                return false;
-            }
-          });
-
-          if (!hasDamageTypes) {
-            removedNFTs.push({
-              name: metadata.name + ": " + metadata.id,
-              reason: `Missing required damage types: ${checkedDamageTypes.join(
-                ", "
-              )}`,
-            });
-            return false;
-          }
-        }
-
-        // Rarity filter
-        const checkedRarities = Object.entries(checkedRarity)
-          .filter(([_, checked]) => checked)
-          .map(([type]) => type);
-
-        if (
-          checkedRarities.length > 0 &&
-          !checkedRarities.includes(metadata.properties.rarity)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `Rarity ${
-              metadata.properties.rarity
-            } not in [${checkedRarities.join(", ")}]`,
-          });
-          return false;
-        }
-
-        // Level Requirement filter
-        if (
-          levelRequirementFilterValue[0] > 0 &&
-          (!metadata.properties.levelRequirement ||
-            metadata.properties.levelRequirement === undefined)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `No level requirement value when filter is active`,
-          });
-          return false;
-        }
-
-        if (
-          metadata.properties.levelRequirement &&
-          (levelRequirementFilterValue[0] >
-            metadata.properties.levelRequirement ||
-            levelRequirementFilterValue[1] <
-              metadata.properties.levelRequirement)
-        ) {
-          removedNFTs.push({
-            name: metadata.name + ": " + metadata.id,
-            reason: `Level requirement ${
-              metadata.properties.levelRequirement
-            } outside range [${levelRequirementFilterValue.join("-")}]`,
-          });
-          return false;
-        }
-
-        return true;
-      });
-
-      // Group removed NFTs by reason
-      const groupedRemovals = removedNFTs.reduce((acc, item) => {
-        acc[item.reason] = acc[item.reason] || [];
-        acc[item.reason].push(item.name);
-        return acc;
-      }, {});
-
-      console.log("[Filter] Filtering complete:", {
-        totalNFTs: nfts.length,
-        filtered: filtered.length,
-        removedNFTs: nfts.length - filtered.length,
-        removalReasons: groupedRemovals,
-      });
-
-      return filtered;
-    };
-
-    setFilteredNFTs(filterNFTs(nfts));
-  }, [
-    nfts,
-    searchTerm,
-    activeCategoryClassFilters,
-    levelRequirementFilterValue,
-    damageFilterValue,
-    qualityFilterValue,
-    rangeFilterValue,
-    attackSpeedFilterValue,
-    levelFilterValue,
-    checkedDamageType,
-    checkedRarity,
-    modsFilterArray,
-  ]);
-
+export const SortingSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
+  const { updateFilter, filters, searchTerm, resetFilters, isDefaultFilters } =
+    useNFTContext();
   const menuItemStyles = {
     root: {
       fontSize: "16px",
@@ -606,60 +72,71 @@ export const SortingSidebar = ({
         }}
       >
         <Menu menuItemStyles={menuItemStyles}>
-          {/*  
-              Season
-              Class Requirement
-            */}
+          <div
+            className="border-gray-900"
+            style={{
+              borderBottom: isDefaultFilters ? "2px solid #202020" : "none",
+              border: isDefaultFilters ? "none" : "1px solid #6a6a6a",
+            }}
+          >
+            <button
+              onClick={resetFilters}
+              style={{
+                backgroundColor: isDefaultFilters ? "#1c1b21" : "#202020",
+              }}
+              className="w-full px-2 py-2 text-sm text-gray-300  transition-colors hover:brightness-110"
+            >
+              Reset All Filters
+            </button>
+          </div>
           <SubMenu label="Search" defaultOpen="true">
             <Input
               placeholder={"Item Name..."}
-              value={searchTermInputValue}
-              onChange={(e) => setSearchTermInputValue(e.target.value)}
+              value={filters.searchTerm}
+              onChange={(e) => updateFilter("searchTerm", e.target.value)}
               className="w-[300px] h-[60px] text-md"
             />
           </SubMenu>
           <SortByMods
-            modsFilterArray={modsFilterArray}
-            setModList={setModsFilterArray}
+            modsFilterArray={filters.modsFilterArray}
+            setModList={(newMods) => updateFilter("modsFilterArray", newMods)}
             defaultOpen={true}
           />
-          <ItemCategoryClassFilter
-            setActiveCategoryClassFilters={setActiveCategoryClassFilters}
-            defaultOpen={true}
-          />
+          <ItemCategoryClassFilter defaultOpen={true} />
           <MenuCheckbox
             name="Rarity"
             items={["Unique", "Rare"]}
-            checked={checkedRarity}
-            setChecked={setCheckedRarity}
+            checked={filters.checkedRarity}
+            setChecked={(newValue) => updateFilter("checkedRarity", newValue)}
             isSidebarOpen={isSidebarOpen}
             defaultOpen={true}
           />
           <MenuSlider
             name={"Level"}
-            value={levelFilterValue}
-            setValue={setLevelFilterValue}
+            value={filters.levelFilterValue}
+            setValue={(newValue) => updateFilter("levelFilterValue", newValue)}
             min={0}
             max={100}
             defaultOpen={false}
           />
-
           <MenuSlider
             name="Damage"
-            value={damageFilterValue}
-            setValue={setDamageFilterValue}
+            value={filters.damageFilterValue}
+            setValue={(newValue) => updateFilter("damageFilterValue", newValue)}
           />
           <MenuSlider
             name="Quality"
-            value={qualityFilterValue}
-            setValue={setQualityFilterValue}
+            value={filters.qualityFilterValue}
+            setValue={(newValue) =>
+              updateFilter("qualityFilterValue", newValue)
+            }
             min={1}
             max={5}
           />
           <MenuSlider
             name="Range"
-            value={rangeFilterValue}
-            setValue={setRangeFilterValue}
+            value={filters.rangeFilterValue}
+            setValue={(newValue) => updateFilter("rangeFilterValue", newValue)}
             min={0}
             max={10}
             step={0.1}
@@ -668,34 +145,30 @@ export const SortingSidebar = ({
           <MenuCheckbox
             name="Damage Type"
             items={["Fire", "Cold", "Lightning", "Physical", "Aether"]}
-            checked={checkedDamageType}
-            setChecked={setCheckedDamageType}
+            checked={filters.checkedDamageType}
+            setChecked={(newValue) =>
+              updateFilter("checkedDamageType", newValue)
+            }
             isSidebarOpen={isSidebarOpen}
           />
           <MenuSlider
             name={"Attack Speed"}
-            value={attackSpeedFilterValue}
-            setValue={setAttackSpeedFilterValue}
+            value={filters.attackSpeedFilterValue}
+            setValue={(newValue) =>
+              updateFilter("attackSpeedFilterValue", newValue)
+            }
             min={0}
             max={3}
             step={0.1}
             defaultOpen={false}
           />
-
           <MenuSlider
             name="Level Requirement"
-            value={levelRequirementFilterValue}
-            setValue={setLevelRequirementFilterValue}
+            value={filters.levelRequirementFilterValue}
+            setValue={(newValue) =>
+              updateFilter("levelRequirementFilterValue", newValue)
+            }
           />
-          {/* 
-             /////////////////// Only one season for now ///////////////////
-            <MenuCheckbox
-              name="Item Season"
-              items={["Open Beta"]}
-              checked={checkedItemSeason}
-              setChecked={setCheckedItemSeason}/> 
-              /////////////////// Only one season for now ///////////////////
-              */}
         </Menu>
       </Sidebar>
     </div>
