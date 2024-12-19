@@ -1,8 +1,5 @@
 export const ITEMS_CONTRACT = "0x6faFc37AceF09F6F2DDAd63a74bda677544E022A";
 
-export const MAGNUS_ADDRESS = "0x5cb12491E161174D6E6ae4515f6354eB55dE1F3E";
-export const NILS_ADDRESS = "0x7b3B6753CC640D045f5b299FB98B28Cd9c1ceB68";
-
 export const ABI_ITEMS = [
   {
     type: "constructor",
