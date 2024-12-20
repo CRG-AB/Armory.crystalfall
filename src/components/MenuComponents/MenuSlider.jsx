@@ -5,19 +5,6 @@ import nodeDefault from "../../img/buttons/node/node-default.webp";
 import nodeHover from "../../img/buttons/node/node-hover.webp";
 import nodeActive from "../../img/buttons/node/node-active.webp";
 
-{
-  /* <MenuSlider
-  name="Range"
-  value={RangeFilterValue}
-  setValue={setRangeFilterValue}
-  min={0}
-  max={10}
-/>; 
-
-const [RangeFilterValue, setRangeFilterValue] = useState([0, 10]);
-*/
-}
-
 export const MenuSlider = ({
   name,
   value,

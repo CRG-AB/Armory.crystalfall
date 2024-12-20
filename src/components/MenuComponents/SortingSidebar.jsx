@@ -1,26 +1,15 @@
-import { useState, useEffect } from "react";
-
 import { Sidebar, Menu } from "react-pro-sidebar";
 import { MenuCheckbox } from "./MenuCheckbox.jsx";
 import { MenuSlider } from "./MenuSlider.jsx";
 import { ItemCategoryClassFilter } from "./ItemCategoryClassFilter.jsx";
-import { SortByMods, filterNFTsByMods } from "./SortByMods.jsx";
+import { SortByMods } from "./SortByMods.jsx";
 import { Expandable } from "../buttons/Expandable.jsx";
 import { Input } from "../ui/Input.jsx";
 import { SubMenu } from "react-pro-sidebar";
 import { useNFTContext } from "../../context/NFTContext";
 
-{
-  /* 
-  <SortingSidebar
-      isSidebarOpen={isSidebarOpen}
-      nfts={nfts}
-      setFilteredNFTs={setFilteredNFTs}
-  /> 
-  */
-}
 export const SortingSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
-  const { updateFilter, filters, searchTerm, resetFilters, isDefaultFilters } =
+  const { updateFilter, filters, resetFilters, isDefaultFilters } =
     useNFTContext();
   const menuItemStyles = {
     root: {
@@ -62,8 +51,8 @@ export const SortingSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       />
       <Sidebar
         backgroundColor="#151419"
-        className={`h-full top-0 left-0 z-40 animate-smooth-right ${
-          isSidebarOpen ? "block translate-x-0" : "hidden -translate-x-full"
+        className={`h-full top-0 left-0 z-40 ${
+          isSidebarOpen ? "block" : "hidden"
         }`}
         width="300px"
         rootStyles={{
@@ -89,7 +78,7 @@ export const SortingSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
               Reset All Filters
             </button>
           </div>
-          <SubMenu label="Search" defaultOpen="true">
+          <SubMenu label="Search" defaultOpen="false">
             <Input
               placeholder={"Item Name..."}
               value={filters.searchTerm}
@@ -102,14 +91,14 @@ export const SortingSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             setModList={(newMods) => updateFilter("modsFilterArray", newMods)}
             defaultOpen={true}
           />
-          <ItemCategoryClassFilter defaultOpen={true} />
+          <ItemCategoryClassFilter defaultOpen={false} />
           <MenuCheckbox
             name="Rarity"
             items={["Unique", "Rare"]}
             checked={filters.checkedRarity}
             setChecked={(newValue) => updateFilter("checkedRarity", newValue)}
             isSidebarOpen={isSidebarOpen}
-            defaultOpen={true}
+            defaultOpen={false}
           />
           <MenuSlider
             name={"Level"}

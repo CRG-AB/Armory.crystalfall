@@ -1,12 +1,9 @@
 import { useParams } from "react-router-dom";
 import { styled } from "styled-components";
-import { ITEMS_CONTRACT } from "../../CONST.js";
 import { motion } from "framer-motion";
-
 import { Spinner } from "../../components/ui/Spinner.jsx";
 import { ItemCard } from "../../components/ItemCard.jsx";
 import { fetchNFT } from "../../services/fetchTokenIds.js";
-
 import conMap from "../../img/images/con-map.webp";
 import CardBackground from "../../img/ui/big-text-box.webp";
 import { useEffect, useState } from "react";
@@ -52,7 +49,7 @@ export const DisplayOwnedToken = () => {
       (async () => {
         const fetchedNft = await fetchNFT(tokenId);
         if (
-          fetchedNft.owner == "0x0000000000000000000000000000000000000000" &&
+          fetchedNft.owner === "0x0000000000000000000000000000000000000000" &&
           count < 3
         ) {
           setTimeout(() => {
@@ -60,14 +57,14 @@ export const DisplayOwnedToken = () => {
           }, 5000);
         }
         if (
-          fetchedNft.owner == "0x0000000000000000000000000000000000000000" &&
+          fetchedNft.owner === "0x0000000000000000000000000000000000000000" &&
           count >= 3
         ) {
           let newValue = fetchedNft;
           newValue.metadata.uri = "notFound";
           setNft(newValue);
         }
-        if (!fetchedNft.owner == "0x0000000000000000000000000000000000000000") {
+        if (fetchedNft.owner != "0x0000000000000000000000000000000000000000") {
           setNft(fetchedNft);
         }
       })();

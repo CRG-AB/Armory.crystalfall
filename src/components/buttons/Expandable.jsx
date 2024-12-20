@@ -2,13 +2,6 @@ import expandable from "../../img/buttons/arrows/expandable.webp";
 import expanded from "../../img/buttons/arrows/expanded.webp";
 import { useState, useEffect } from "react";
 
-{
-  /* <SidebarOpenCloseButton
-            isSidebarOpen={isSidebarOpen}
-            setIsSidebarOpen={setIsSidebarOpen}
-          /> */
-}
-
 export const Expandable = ({ isSidebarOpen, setIsSidebarOpen, className }) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -29,7 +22,8 @@ export const Expandable = ({ isSidebarOpen, setIsSidebarOpen, className }) => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [isSidebarOpen, setIsSidebarOpen]);
+  }, [isSidebarOpen, setIsSidebarOpen, setWindowWidth]);
+
   return (
     <button
       onClick={(e) => {
@@ -42,7 +36,7 @@ export const Expandable = ({ isSidebarOpen, setIsSidebarOpen, className }) => {
         isSidebarOpen ? "ml-24" : ""
       }`}
     >
-      <img src={isSidebarOpen ? expanded : expandable} className="h-10" />
+      <img src={isSidebarOpen ? expanded : expandable} className="h-10" alt="Toggle sidebar" />
     </button>
   );
 };

@@ -2,18 +2,8 @@ import { styled } from "styled-components";
 import React, { useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 
-import horisontalLine from "../../img/ui/LineThing.svg";
 import CardBackground from "../../img/ui/small_card.png";
-import { motion } from "framer-motion";
 
-const StyledImg = styled.img`
-  width: 160px;
-  margin-top: 15px;
-  filter: brightness(1.2) contrast(1.5);
-  transition: 0.5s ease;
-  transform: translateZ(0);
-  will-change: transform;
-`;
 const StyledP = styled.p`
   all: unset;
   font-size: 11px;
@@ -21,13 +11,14 @@ const StyledP = styled.p`
   color: #fff;
   text-align: center;
   padding: 5px 0px;
+  margin-top: 15px;
 `;
 
 const StyledDiv = styled.div`
   height: 250px;
   width: 200px;
   flex-direction: column;
-  transform-origin: top left;
+  transform-origin: center;
   background-image: url(${CardBackground});
   background-size: cover;
   padding: 30px 20px 20px;
@@ -106,7 +97,6 @@ export const DisplayToken = ({
         }}
       >
         <StyledIPFS className="itemImage" src={img} />
-        <StyledImg src={horisontalLine} alt={name} />
         <StyledP>{name}</StyledP>
       </NavLink>
     </StyledDiv>

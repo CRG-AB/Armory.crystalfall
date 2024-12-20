@@ -1,4 +1,4 @@
-import { NFTCollectionInitializer, ThirdwebSDK } from "@thirdweb-dev/sdk";
+import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { ITEMS_CONTRACT } from "../CONST";
 
 const sdk = new ThirdwebSDK(13337, {

@@ -30,14 +30,14 @@ export const codeResponse = () => {
         },
       });
       console.log(response);
-      if (response.status == 200) {
+      if (response.status === 200) {
         const jsonResponse = await response.text();
         localStorage.setItem("walletAddress", jsonResponse);
         window.location.href = "/#/profile";
-      } else if (response.status == 204) {
+      } else if (response.status === 204) {
         window.location.href = "/#/profile";
         localStorage.setItem("walletAddress", "undefined");
-      } else if (response.status == 401) {
+      } else if (response.status === 401) {
         window.location.href = "/#/";
       }
     });

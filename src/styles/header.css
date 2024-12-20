@@ -39,7 +39,7 @@
 .menu-logo {
   display: flex;
   align-items: center;
-  padding-left: 35px;
+  padding-left: 0px;
   margin-right: 0px;
   @media screen and (max-width: 600px) {
     display: none;

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { SubMenu } from "react-pro-sidebar";
 import mods from "./mods.json";
-import { Plus, X } from "lucide-react";
+import { Plus, X, ChevronDown } from "lucide-react";
 import boxBakgroundSelected from "../../img/ui/box-background-selected.webp";
 
 // Helper function to check if an NFT has a specific mod
@@ -33,9 +34,40 @@ export const filterNFTsByMods = (nfts, selectedMods) => {
 
 export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
   const [selectedValue, setSelectedValue] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef(null);
+  const dropdownRef = useRef(null);
 
-  const handleSelectChange = (event) => {
-    setSelectedValue(event.target.value);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleScroll = (event) => {
+      // If the scroll event is from the dropdown itself, don't close it
+      if (dropdownRef.current?.contains(event.target)) return;
+      setIsOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("scroll", handleScroll, true);
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("scroll", handleScroll, true);
+    };
+  }, []);
+
+  const handleSelect = (value) => {
+    setSelectedValue(value);
+    setIsOpen(false);
   };
 
   const isModAlreadyAdded = (mod) => {
@@ -53,6 +85,34 @@ export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
   const handleRemoveMod = (mod) => {
     const updatedModList = modsFilterArray.filter((item) => item !== mod);
     setModList(updatedModList);
+  };
+
+  const renderDropdown = () => {
+    if (!isOpen || !buttonRef.current) return null;
+
+    const buttonRect = buttonRef.current.getBoundingClientRect();
+
+    return createPortal(
+      <div
+        ref={dropdownRef}
+        className="fixed z-[9999] w-[290px] overflow-auto bg-[#1c1b21] max-h-[300px] rounded-sm shadow-lg"
+        style={{
+          top: buttonRect.bottom + 4,
+          left: buttonRect.left,
+        }}
+      >
+        {mods.modifiers.map((option) => (
+          <div
+            key={option}
+            className="py-2 pl-3 pr-9 cursor-pointer text-gray-300 hover:bg-gray-700/30 hover:text-white"
+            onClick={() => handleSelect(option)}
+          >
+            {option}
+          </div>
+        ))}
+      </div>,
+      document.body
+    );
   };
 
   return (
@@ -87,22 +147,32 @@ export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
           borderCollapse: "collapse",
         }}
       >
-        <select
-          className="pl-1 bg-transparent w-[250px] cursor-pointer outline-none text-sm"
-          value={selectedValue}
-          onChange={handleSelectChange}
+        <button
+          ref={buttonRef}
+          className="relative w-[250px] pl-1 pr-8 py-2 text-left bg-transparent text-gray-300 text-sm cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent the click from affecting the SubMenu
+            setIsOpen(!isOpen);
+          }}
         >
-          <option value="">Select a mod type...</option>
-          {mods.modifiers.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <button onClick={handleAddMod} className="flex-shrink-0">
+          <span className="block truncate">
+            {selectedValue || "Select a mod type..."}
+          </span>
+          <span className="absolute inset-y-0 right-0 flex items-center pr-2">
+            <ChevronDown size={16} className={`transform transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          </span>
+        </button>
+        <button 
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent the click from affecting the SubMenu
+            handleAddMod(e);
+          }} 
+          className="flex-shrink-0 text-gray-300 hover:text-white"
+        >
           <Plus size={20} />
         </button>
       </div>
+      {renderDropdown()}
     </SubMenu>
   );
 };

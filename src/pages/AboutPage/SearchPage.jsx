@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useState, useRef } from "react";
 import styled from "styled-components";
 import { Search } from "lucide-react";
 import { Input } from "../../components/ui/Input";
@@ -44,7 +44,7 @@ export const SearchPage = () => {
   const handleTokenSubmit = (event) => {
     event.preventDefault();
 
-    if (tokenId >= 0 && tokenId != "") {
+    if (tokenId >= 0 && tokenId !== "") {
       console.log(tokenId);
       navigate(`/token/${tokenId}`);
     } else {
@@ -130,8 +130,9 @@ export const SearchPage = () => {
                   onSubmit={handleSubmit}
                   className="flex flex-col items-center"
                 >
-                  <label className="mb-2">
+                  <div className="mb-2">
                     <Input
+                      id="address-input"
                       type="text"
                       value={address}
                       onChange={handleAddressChange}
@@ -139,7 +140,7 @@ export const SearchPage = () => {
                       placeholder="Address: 0x..."
                       error={error2}
                     />
-                  </label>
+                  </div>
                   {error2 && (
                     <p className="text-red-500 text-sm px-6 animate-pulse">
                       {error2}
@@ -157,16 +158,17 @@ export const SearchPage = () => {
                   onSubmit={handleTokenSubmit}
                   className="flex flex-col items-center mt-4"
                 >
-                  <label className="mb-2">
+                  <div className="mb-2">
                     <Input
+                      id="token-input"
                       type="number"
                       value={tokenId}
                       onChange={handleTokenIdChange}
                       className="w-[220px] h-[45px]"
-                      placeholder=" Token ID"
+                      placeholder="Token ID"
                       error={error}
                     />
-                  </label>
+                  </div>
                   {error && (
                     <p className="text-red-500 animate-pulse">{error}</p>
                   )}

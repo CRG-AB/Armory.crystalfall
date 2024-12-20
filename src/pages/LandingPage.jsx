@@ -38,7 +38,7 @@ export const LandingPage = () => {
   const contract = new web3.eth.Contract(ABI_ITEMS, ITEMS_CONTRACT);
 
   const pathName = new URLSearchParams(window.location.search).get("code");
-  if (pathName != null) codeResponse();
+  if (pathName !== null) codeResponse();
 
   /// FUCNTION FOR SEARCHING BY ADDRESS OR TOKEN ID
   const [input, setInput] = useState("");
@@ -72,7 +72,7 @@ export const LandingPage = () => {
         .then(() => {
           navigate(`/token/${input}`);
         })
-        .catch((error) => {
+        .catch(() => {
           newError("Token not found", 8000);
         });
     } else if (input === "") {

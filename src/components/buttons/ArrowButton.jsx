@@ -2,13 +2,6 @@ import arrowNormal from "../../img/buttons/arrows/arrow-btn-default-up.webp";
 import arrowHover from "../../img/buttons/arrows/arrow-btn-hover-up.webp";
 import { useState } from "react";
 
-{
-  /* <SidebarOpenCloseButton
-            isSidebarOpen={isSidebarOpen}
-            setIsSidebarOpen={setIsSidebarOpen}
-          /> */
-}
-
 export const ArrowButton = ({ direction, onClick, disabled }) => {
   const [isHovered, setIsHovered] = useState(false);
 

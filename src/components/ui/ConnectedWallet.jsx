@@ -13,7 +13,7 @@ export const ConnectedWallet = ({ wallet, className }) => {
       }}
       className={`flex gap-4 items-center justify-around ${className}`}
     >
-      {wallet != "undefined" && wallet != "" ? (
+      {wallet !== 'undefined' && wallet !== null ? (
         <div>Wallet: {wallet}</div>
       ) : (
         <div>No wallet found, create a Game Account first</div>

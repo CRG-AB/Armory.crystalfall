@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from "react";
-
 import { SubMenu } from "react-pro-sidebar";
 import { Checkbox } from "../buttons/Checkbox";
 import { useNFTContext } from "../../context/NFTContext";

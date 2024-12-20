@@ -42,7 +42,7 @@ const Content = styled.div`
 
 const StylediFrame = styled.iframe`
   width: 635px;
-  height: 357px;
+  height: 360px;
   @media screen and (max-width: 870px) {
     width: 330px;
     height: 281px;
@@ -142,12 +142,12 @@ export const AboutPage = () => {
               className="youtube-player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               title="Crystals of Naramunz │ Upcoming steampunk Action RPG"
-              src="https://www.youtube.com/embed/ihDAvgNi_n4?controls=1&amp;rel=0&amp;playsinline=1&amp;modestbranding=0&amp;autoplay=1&amp;enablejsapi=1&amp;origin=https%3A%2F%2Fwww.naramunz.com&amp;widgetid=1&mute=1"
+              src="https://www.youtube.com/embed/8mDUuOh1sg8?controls=1&amp;rel=0&amp;playsinline=1&amp;modestbranding=0&amp;autoplay=1&amp;enablejsapi=1&amp;origin=https%3A%2F%2Fwww.naramunz.com&amp;widgetid=1&mute=1"
               id="widget2"
               data-gtm-yt-inspected-16="true"
             ></StylediFrame>
           </div>
-          <div className="ml-8 text-lg w-2/5 m:w-4/5 m:ml-0">
+          <div className="ml-8 text-lg w-2/5 m:w-4/5 m:ml-0"> 
             <h1 className="text-4xl ml-8 mb-4 font-bold m:ml-0 m:-mt-6">
               About the game
             </h1>

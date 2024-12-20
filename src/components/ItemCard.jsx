@@ -134,12 +134,6 @@ const StatLine = styled.div`
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
 `;
 
-const WeaponTypeLine = styled(StatLine)`
-  margin-bottom: 4px;
-  color: #78674e;
-  font-weight: 500;
-`;
-
 const StatAndImageContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -253,21 +247,6 @@ const RequirementsText = styled.div`
   font-size: 14px;
   margin: 4px 0;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
-`;
-
-const MetadataInfo = styled.div`
-  color: #666;
-  font-size: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  text-align: center;
-  border-top: 1px solid #333;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
 `;
 
 export const ItemCard = ({ token }) => {
@@ -631,7 +610,7 @@ export const ItemCard = ({ token }) => {
           </>
         )}
       </ModBlock>
-      {description && rarity && rarity == "Unique" && (
+      {description && rarity && rarity === "Unique" && (
         <Description>{description}</Description>
       )}
       <ChainInfo>On-chain Id: {id}</ChainInfo>

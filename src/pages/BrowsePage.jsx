@@ -1,17 +1,12 @@
 import { styled } from "styled-components";
-import { useState, useEffect } from "react";
-import { fetchTokenIds, fetchNFTs } from "../services/fetchTokenIds.js";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
 
 import { NFTGrid } from "../components/NFTGrid";
 import { SortingSidebar } from "../components/MenuComponents/SortingSidebar.jsx";
 
 import city from "../img/images/city-back-drop.webp";
 import softLight from "../img/images/soft-light-fog.webp";
-
-import buttonnew from "../img/ui/buttonnew.svg";
-import buttonnewhighlight from "../img/ui/buttonnewhighlight.svg";
 
 import { useNFTContext } from "../context/NFTContext";
 
@@ -46,7 +41,7 @@ const Background = styled.div`
 `;
 
 export const BrowsePage = () => {
-  const { filteredNFTs, setFilteredNFTs, allNFTs, setAllNFTs, isLoading } =
+  const { filteredNFTs, setFilteredNFTs, allNFTs, isLoading } =
     useNFTContext();
   // Filtered data array
 
@@ -57,10 +52,6 @@ export const BrowsePage = () => {
   const nftsPerPage = 30;
   const [count, setCount] = useState(0);
   const totalPages = Math.ceil((filteredNFTs?.length || 0) / nftsPerPage);
-
-  useEffect(() => {
-    window.scrollTo({ top: 100, behavior: "smooth" });
-  }, [count]);
 
   return (
     <StyledProfilePage>

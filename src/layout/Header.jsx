@@ -1,10 +1,7 @@
 import { NavLink } from "react-router-dom";
-
 import headerBar from "../img/ui/header-bar.svg";
 import CrystalFall from "../img/crg/CrystalFall.svg";
 import testnet from "../img/ui/Testnet.svg";
-
-// Import social media icons (assuming you have these SVGs)
 import discordIcon from "../img/crg/socials/discord.svg";
 import youtubeIcon from "../img/crg/socials/youtube.svg";
 import twitterIcon from "../img/crg/socials/x.svg";
@@ -33,10 +30,10 @@ export const Header = () => {
 
       <NavLink
         to="/"
-        className="absolute left-1/2 -ml-[120px] -mt-2 flex items-center"
+        className="absolute left-1/2 transform -mt-2 -translate-x-1/2 flex items-center"
       >
         <img src={CrystalFall} alt="CrystalFall" className="h-16" />
-        <p className="">
+        <p>
           <img
             src={testnet}
             alt="Testnet"

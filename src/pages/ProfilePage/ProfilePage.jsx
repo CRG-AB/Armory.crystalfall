@@ -1,13 +1,10 @@
 import { styled } from "styled-components";
-import { useOwnedNFTs, useContract, useTotalCount } from "@thirdweb-dev/react";
+import { useOwnedNFTs, useContract} from "@thirdweb-dev/react";
 import { ITEMS_CONTRACT } from "../../CONST.js";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "react-router";
-
 import { NFTGrid } from "../../components/NFTGrid";
 import { ConnectedWallet } from "../../components/ui/ConnectedWallet.jsx";
-import { thirdWebIPFSLink } from "../../services/IPFSLink";
-
 import softLight from "../../img/images/soft-light-fog.webp";
 import vault from "../../img/images/vault.webp";
 import epicLogoWhite from "../../img/buttons/epicLogoWhite.webp";
@@ -24,12 +21,6 @@ const StyledProfilePage = styled.div`
   animation: fadeIn 0.5s;
 `;
 
-const ContentWrapper = styled.div`
-  position: relative;
-  width: 100vw;
-  max-width: 2000px;
-`;
-
 const Background = styled.div`
   background-image: url(${softLight});
   background-size: cover;
@@ -39,7 +30,6 @@ const Background = styled.div`
   min-height: 80vh;
   height: 100%;
   overflow: hidden;
-
   @media screen and (max-width: 870px) {
     padding: 0px;
   }
@@ -47,7 +37,7 @@ const Background = styled.div`
 
 export const ProfilePage = () => {
   // ADDRESS LOGIC
-  const [address, setAddress] = useState(
+  const [address] = useState(
     useParams().address ||
       (localStorage.getItem("walletAddress") &&
         localStorage.getItem("walletAddress").replace(/"/g, ""))
@@ -59,22 +49,18 @@ export const ProfilePage = () => {
   };
 
   // SIDEBAR LOGIC
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
-  const [filteredNFTs, setFilteredNFTs] = useState([]);
+  const [isSidebarOpen] = useState(window.innerWidth > 768);
+  const [filteredNFTs] = useState([]);
 
   // THIRDWEB
   const { contract: contractItems } = useContract(ITEMS_CONTRACT);
-  const { data: nfts, isLoading } = useOwnedNFTs(contractItems, address);
+  const { data: isLoading } = useOwnedNFTs(contractItems, address);
 
   const nftsPerPage = 20;
   const [count, setCount] = useState(0);
   const totalPages = Math.ceil((filteredNFTs?.length || 0) / nftsPerPage);
 
-  useEffect(() => {
-    window.scrollTo({ top: 100, behavior: "smooth" });
-  }, []);
-
-  if (address || address == "") {
+  if (address || address === "") {
     return (
       <StyledProfilePage>
         <ContentWrapper>
@@ -112,18 +98,17 @@ export const ProfilePage = () => {
 
   return (
     <StyledProfilePage>
-      <ContentWrapper>
         <hr />
-        <Background>
           <div className="h-[80vh] flex flex-col items-center justify-center m:scale-75">
             <div
               className="flex flex-col items-center px-20 py-32 bg-contain bg-no-repeat bg-center"
               style={{ backgroundImage: `url(${bigTextBox})` }}
             >
-              <div className="w-72 flex items-center justify-center relative -mt-4">
+              <div className="flex items-center justify-center">
                 <img
                   src={CrystalFall}
-                  className=" w-60 object-contain z-10 mb-2"
+                  className="w-60 object-contain z-10"
+                  alt="CrystalFall Logo"
                 />
               </div>
               <h1 className="text-xl mb-6">Sign in with Epic Games</h1>
@@ -131,13 +116,11 @@ export const ProfilePage = () => {
                 className="h-32 w-80 flex items-center justify-center stylized-crg-button scale-125"
                 onClick={loginWithEpic}
               >
-                <img src={epicLogoWhite} className="h-8" />
+                <img src={epicLogoWhite} className="h-8" alt="Epic Games Logo" />
               </div>
             </div>
           </div>
-        </Background>
         <hr />
-      </ContentWrapper>
     </StyledProfilePage>
   );
 };

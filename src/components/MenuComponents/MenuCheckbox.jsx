@@ -1,22 +1,6 @@
 import { Checkbox } from "../buttons/Checkbox";
 import { SubMenu } from "react-pro-sidebar";
 
-{
-  /* <MenuCheckbox
-              name="Rarity"
-              items={["Legendary", "Rare"]}
-              checked={checkedRarity}
-              setChecked={setCheckedRarity}
-            />
-
-const [checkedDamageType, setCheckedDamageType] = useState({
-  fire: false,
-  ice: false,
-  lightning: false,
-  physical: false,
-}); */
-}
-
 export const MenuCheckbox = ({
   items,
   checked,
