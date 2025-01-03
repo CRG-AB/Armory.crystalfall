@@ -18,16 +18,25 @@ export const ConnectedWallet = ({ wallet, className }) => {
       ) : (
         <div>No wallet found, create a Game Account first</div>
       )}
-      <div
+      <button
         onClick={() => {
           localStorage.removeItem("walletAddress");
           localStorage.removeItem("authToken");
           window.location.href = "/#/";
         }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            localStorage.removeItem("walletAddress");
+            localStorage.removeItem("authToken");
+            window.location.href = "/#/";
+          }
+        }}
         className="cursor-pointer"
+        tabIndex={0}
+        aria-label="Logout"
       >
         <LogOut />
-      </div>
+      </button>
     </div>
   );
 };

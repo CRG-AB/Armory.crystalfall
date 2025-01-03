@@ -102,13 +102,19 @@ export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
         }}
       >
         {mods.modifiers.map((option) => (
-          <div
+          <button
             key={option}
-            className="py-2 pl-3 pr-9 cursor-pointer text-gray-300 hover:bg-gray-700/30 hover:text-white"
+            className="w-full text-left py-2 pl-3 pr-9 cursor-pointer text-gray-300 hover:bg-gray-700/30 hover:text-white"
             onClick={() => handleSelect(option)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleSelect(option);
+              }
+            }}
+            tabIndex={0}
           >
             {option}
-          </div>
+          </button>
         ))}
       </div>,
       document.body
@@ -118,9 +124,16 @@ export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
   return (
     <SubMenu label="Mods" defaultOpen={defaultOpen}>
       {modsFilterArray.map((mod) => (
-        <div
+        <button
           key={mod}
-          className="flex justify-between items-center p-2 text-sm hover:bg-gray-700/30"
+          className="flex justify-between items-center p-2 text-sm hover:bg-gray-700/30 w-full"
+          onClick={() => handleRemoveMod(mod)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleRemoveMod(mod);
+            }
+          }}
+          tabIndex={0}
         >
           <span
             className="truncate pr-2 pl-1 w-[250px]"
@@ -128,13 +141,8 @@ export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
           >
             {mod}
           </span>
-          <button
-            onClick={() => handleRemoveMod(mod)}
-            className="hover:text-red-500 flex-shrink-0"
-          >
-            <X size={16} />
-          </button>
-        </div>
+          <X size={16} />
+        </button>
       ))}
       <div
         className="flex items-center h-[58px] w-[290px] gap-1 p-1 mx-2"
@@ -151,7 +159,7 @@ export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
           ref={buttonRef}
           className="relative w-[250px] pl-1 pr-8 py-2 text-left bg-transparent text-gray-300 text-sm cursor-pointer"
           onClick={(e) => {
-            e.stopPropagation(); // Prevent the click from affecting the SubMenu
+            e.stopPropagation();
             setIsOpen(!isOpen);
           }}
         >
@@ -164,7 +172,7 @@ export const SortByMods = ({ modsFilterArray, setModList, defaultOpen }) => {
         </button>
         <button 
           onClick={(e) => {
-            e.stopPropagation(); // Prevent the click from affecting the SubMenu
+            e.stopPropagation();
             handleAddMod(e);
           }} 
           className="flex-shrink-0 text-gray-300 hover:text-white"

@@ -112,12 +112,19 @@ export const ProfilePage = () => {
                 />
               </div>
               <h1 className="text-xl mb-6">Sign in with Epic Games</h1>
-              <div
+              <button
                 className="h-32 w-80 flex items-center justify-center stylized-crg-button scale-125"
                 onClick={loginWithEpic}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    loginWithEpic();
+                  }
+                }}
+                tabIndex={0}
+                aria-label="Login with Epic Games"
               >
                 <img src={epicLogoWhite} className="h-8" alt="Epic Games Logo" />
-              </div>
+              </button>
             </div>
           </div>
         <hr />

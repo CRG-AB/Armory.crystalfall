@@ -4,9 +4,14 @@ import checkboxHover from "../../img/buttons/node/node-hover.webp";
 
 export const Checkbox = ({ checked, onChange, name, level }) => {
   return (
-    <div
+    <button
       className="p-2"
       onClick={onChange}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          onChange();
+        }
+      }}
       onMouseOver={(e) => {
         e.currentTarget.firstChild.style.backgroundImage = `url(${checkboxHover})`;
       }}
@@ -15,6 +20,17 @@ export const Checkbox = ({ checked, onChange, name, level }) => {
           checked ? checkboxActive : checkboxDefault
         })`;
       }}
+      onFocus={(e) => {
+        e.currentTarget.firstChild.style.backgroundImage = `url(${checkboxHover})`;
+      }}
+      onBlur={(e) => {
+        e.currentTarget.firstChild.style.backgroundImage = `url(${
+          checked ? checkboxActive : checkboxDefault
+        })`;
+      }}
+      role="checkbox"
+      aria-checked={checked}
+      tabIndex={0}
     >
       <div
         className={`flex row items-center ${checked ? "active" : ""}`}
@@ -37,6 +53,6 @@ export const Checkbox = ({ checked, onChange, name, level }) => {
           {name}
         </p>
       </div>
-    </div>
+    </button>
   );
 };
