@@ -4,7 +4,7 @@ import checkboxHover from "../../img/buttons/node/node-hover.webp";
 
 export const Checkbox = ({ checked, onChange, name, level }) => {
   return (
-    <button
+    <div
       className="p-2"
       onClick={onChange}
       onKeyDown={(e) => {
@@ -53,6 +53,6 @@ export const Checkbox = ({ checked, onChange, name, level }) => {
           {name}
         </p>
       </div>
-    </button>
+    </div>
   );
 };

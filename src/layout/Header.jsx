@@ -20,9 +20,9 @@ export const Header = () => {
         <NavLink className="menu-item" to="/browse">
           Browse
         </NavLink>
-        <NavLink className="menu-item" to="/profile">
+        {/* <NavLink className="menu-item" to="/profile">
           Profile
-        </NavLink>
+        </NavLink> */}
         <NavLink className="menu-item" to="/about">
           About
         </NavLink>
