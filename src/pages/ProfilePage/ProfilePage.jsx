@@ -35,6 +35,12 @@ const Background = styled.div`
   }
 `;
 
+const ContentWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const ProfilePage = () => {
   // ADDRESS LOGIC
   const [address] = useState(
