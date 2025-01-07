@@ -65,17 +65,11 @@ Styled-components are also used extensively within individual component files to
 
 ### Prerequisites
 
-- Node.js and npm or Yarn should be installed on your machine.
+- Node.js and npm should be installed on your machine.
 
 ### Installation
 
 To install the necessary dependencies, run:
-
-```
-yarn
-```
-
-or
 
 ```
 npm install
@@ -86,38 +80,19 @@ npm install
 To start the development server, use:
 
 ```
-yarn start
-```
-
-or
-
-```
 npm start
 ```
+### Build
 
-### Deployment
-
-To deploy the application, run:
-
-```
-yarn deploy
-```
-
-or
+To build, use:
 
 ```
-npm run deploy
+npm run build
 ```
 
 ### Github Pages Deployment
 
 To deploy the application to Github Pages, run:
-
-```
-yarn gh-pages
-```
-
-or
 
 ```
 npm run gh-pages
